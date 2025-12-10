@@ -509,7 +509,7 @@ export default function SearchPods() {
                 setGenerationProgress(100);
                 setIsGenerating(false);
                 setCurrentCaption(sentences[0] || 'Ready to play');
-                setCaptionWords((sentences[0] || '').split(/\s+/));
+                setCaptionWords((sentences[0] || '').split(/\s+/).map(word => ({ word, highlight: false })));
                 setDuration(cleanText.length / 15);
                 
                 audioRef.current = {
@@ -563,15 +563,32 @@ export default function SearchPods() {
 
             audio.ontimeupdate = () => {
                 setCurrentTime(audio.currentTime);
-                // Update caption based on time
+                // Update caption and words based on time with better sync
                 if (sentences.length > 0 && audio.duration > 0) {
                     const progress = audio.currentTime / audio.duration;
                     const sentenceIndex = Math.min(
                         Math.floor(progress * sentences.length),
                         sentences.length - 1
                     );
-                    setCurrentCaption(sentences[sentenceIndex]);
-                    setCaptionWords(sentences[sentenceIndex].split(/\s+/));
+                    const currentSentence = sentences[sentenceIndex];
+                    setCurrentCaption(currentSentence);
+
+                    // Calculate word-level progress within current sentence
+                    const words = currentSentence.split(/\s+/);
+                    const timePerSentence = audio.duration / sentences.length;
+                    const sentenceStartTime = sentenceIndex * timePerSentence;
+                    const timeIntoSentence = audio.currentTime - sentenceStartTime;
+                    const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
+
+                    // Highlight 2-3 words at a time for smoother sync
+                    const totalWords = words.length;
+                    const currentWordIndex = Math.floor(sentenceProgress * totalWords);
+                    const highlightedWords = words.map((word, i) => ({
+                        word,
+                        highlight: i >= currentWordIndex && i <= currentWordIndex + 1
+                    }));
+
+                    setCaptionWords(highlightedWords);
                 }
             };
 
@@ -1220,8 +1237,8 @@ export default function SearchPods() {
                             <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-56 md:h-56 rounded-3xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
                                 {/* Extended ribbon */}
                                 {extendedCount > 0 && (
-                                    <div className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-20 shadow-lg flex items-center gap-1.5">
-                                        <img src={LOGO_URL} alt="" className="w-3.5 h-3.5 object-contain" />
+                                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-20 shadow-lg flex items-center gap-1.5">
+                                        <img src={LOGO_URL} alt="" className="w-3.5 h-3.5 object-contain brightness-0 invert" />
                                         Extended
                                     </div>
                                 )}
@@ -1301,28 +1318,15 @@ export default function SearchPods() {
                             <div className="mb-4 md:mb-6">
                                 <div className="bg-gray-50 rounded-xl p-3 md:p-4 min-h-[84px] md:h-[84px] border border-gray-200 flex items-center justify-center overflow-hidden">
                                     <p className="text-center leading-relaxed text-sm md:text-base text-gray-700 line-clamp-3">
-                                        {captionWords.map((word, i) => {
-                                            // Calculate word highlight based on time within current sentence
-                                            const sentenceIndex = Math.max(0, sentencesRef.current.findIndex(s => s === currentCaption));
-                                            const sentenceCount = sentencesRef.current.length || 1;
-
-                                            // Each sentence gets equal time slice
-                                            const timePerSentence = duration / sentenceCount;
-                                            const sentenceStartTime = sentenceIndex * timePerSentence;
-                                            const timeIntoSentence = currentTime - sentenceStartTime;
-                                            const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
-
-                                            // Highlight word based on progress through sentence
-                                            const wordCount = captionWords.length || 1;
-                                            const highlightIndex = Math.floor(sentenceProgress * wordCount);
-                                            const isHighlighted = i === highlightIndex || i === highlightIndex - 1;
-
-                                            return (
-                                                <span key={i} className={isHighlighted ? 'text-purple-600 font-semibold' : ''}>
-                                                    {word}{' '}
+                                        {Array.isArray(captionWords) && captionWords.length > 0 && typeof captionWords[0] === 'object' ? (
+                                            captionWords.map((wordObj, i) => (
+                                                <span key={i} className={wordObj.highlight ? 'text-purple-600 font-semibold transition-all duration-150' : 'transition-all duration-150'}>
+                                                    {wordObj.word}{' '}
                                                 </span>
-                                            );
-                                        })}
+                                            ))
+                                        ) : (
+                                            <span>{currentCaption}</span>
+                                        )}
                                     </p>
                                 </div>
                                 {/* Tell me more button */}
