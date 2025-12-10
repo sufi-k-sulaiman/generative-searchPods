@@ -66,6 +66,8 @@ const getRandomTrending = () => {
         items.push({
             title: `${cat.name}: ${randomSubtopic}`,
             category: cat.name,
+            icon: cat.icon,
+            color: cat.color,
             plays: Math.floor(Math.random() * 3000) + 1500,
             image: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=400&h=400&fit=crop'
         });
@@ -1153,32 +1155,35 @@ export default function SearchPods() {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {trending.map((item, i) => (
-                            <div
-                                key={i}
-                                onClick={() => playEpisode(item)}
-                                className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
-                            >
-                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                                    {i + 1}
-                                </div>
-                                <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                        <Play className="w-4 h-4 text-white" fill="white" />
+                        {trending.map((item, i) => {
+                            const IconComponent = item.icon || Radio;
+                            return (
+                                <div
+                                    key={i}
+                                    onClick={() => playEpisode(item)}
+                                    className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
+                                >
+                                    <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                        {i + 1}
                                     </div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
-                                    <p className="text-gray-500 text-xs capitalize">{item.category}</p>
-                                    <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
-                                        <Users className="w-3 h-3" />
-                                        {item.plays.toLocaleString()} plays
+                                    <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: `${item.color}20` }}>
+                                        <IconComponent className="w-8 h-8" style={{ color: item.color }} />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                            <Play className="w-4 h-4 text-white" fill="white" />
+                                        </div>
                                     </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
+                                        <p className="text-gray-500 text-xs capitalize">{item.category}</p>
+                                        <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
+                                            <Users className="w-3 h-3" />
+                                            {item.plays.toLocaleString()} plays
+                                        </div>
+                                    </div>
+                                    <AnimatedBars isPlaying={true} color="#7c3aed" />
                                 </div>
-                                <AnimatedBars isPlaying={true} color="#7c3aed" />
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </main>
