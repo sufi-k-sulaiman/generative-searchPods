@@ -6,7 +6,7 @@ import {
     ChevronRight, X, Clock, Plus, AlertTriangle, RotateCcw, RotateCw,
     ListMusic, Sliders, Eye, MessageSquarePlus, Heart, Shield, Zap,
     Target, Sprout, Mountain, Award, Flame, Gift, Sun, Focus,
-    BookOpen, Brain, Compass, Scale, Lightbulb, Rocket, Star
+    BookOpen, Brain, Compass, Scale, Lightbulb, Rocket, Star, Moon
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -158,6 +158,12 @@ export default function SearchPods() {
     const [isExtending, setIsExtending] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
     const [loadingMoreSubtopics, setLoadingMoreSubtopics] = useState(null);
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('searchpods-dark-mode') === 'true';
+        }
+        return false;
+    });
     
     // Refs for audio playback
     const sentencesRef = useRef([]);
@@ -174,6 +180,13 @@ export default function SearchPods() {
         }, 30000);
         return () => clearInterval(interval);
     }, []);
+
+    // Save dark mode preference
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('searchpods-dark-mode', darkMode);
+        }
+    }, [darkMode]);
 
     // Load trending topics on mount
     useEffect(() => {
@@ -1017,12 +1030,12 @@ export default function SearchPods() {
     };
 
     return (
-        <div className="min-h-screen bg-white pb-8">
+        <div className={`min-h-screen pb-8 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
             {/* Logo Header */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <div className={`${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-b sticky top-0 z-50`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center gap-3">
                     <img src={LOGO_URL} alt="SearchPods" className="h-7 object-contain" />
-                    <span className="text-sm font-bold text-gray-900">SearchPods</span>
+                    <span className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>SearchPods</span>
                 </div>
             </div>
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
@@ -1040,7 +1053,7 @@ export default function SearchPods() {
                             onFocus={() => setShowSuggestions(true)}
                             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                             placeholder="Search any topic"
-                            className="w-full h-14 pl-6 pr-32 rounded-full border-gray-200 bg-white shadow-sm focus:border-purple-300 focus:ring-2 focus:ring-purple-100 text-lg"
+                            className={`w-full h-14 pl-6 pr-32 rounded-full shadow-sm focus:border-purple-300 focus:ring-2 focus:ring-purple-100 text-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-400' : 'bg-white border-gray-200 text-gray-900'}`}
                         />
                         <button
                             type="submit"
@@ -1053,11 +1066,11 @@ export default function SearchPods() {
 
                         {/* Type-ahead suggestions */}
                         {showSuggestions && searchQuery.trim() && (
-                            <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden z-50">
+                            <div className={`absolute top-full mt-2 w-full rounded-2xl shadow-lg border overflow-hidden z-50 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                                 {/* Suggestions Tab */}
                                 {suggestions.length > 0 && (
-                                    <div className="border-b border-gray-200">
-                                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <div className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                        <div className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider ${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
                                             Suggestions
                                         </div>
                                         {suggestions.map((suggestion, i) => (
@@ -1067,10 +1080,10 @@ export default function SearchPods() {
                                                     setSearchQuery(suggestion);
                                                     setShowSuggestions(false);
                                                 }}
-                                                className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
                                             >
                                                 <Sparkles className="w-4 h-4 text-purple-600" />
-                                                <span className="text-gray-900">{suggestion}</span>
+                                                <span>{suggestion}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -1079,7 +1092,7 @@ export default function SearchPods() {
                                 {/* Trending Tab */}
                                 {trendingTopics.length > 0 && (
                                     <div>
-                                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                                        <div className={`px-4 py-2 text-xs font-semibold uppercase tracking-wider flex items-center gap-2 ${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-50 text-gray-500'}`}>
                                             <TrendingUp className="w-3 h-3" />
                                             Trending Now
                                         </div>
@@ -1090,12 +1103,12 @@ export default function SearchPods() {
                                                     setSearchQuery(topic);
                                                     setShowSuggestions(false);
                                                 }}
-                                                className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
                                             >
-                                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 flex items-center justify-center text-xs font-bold text-purple-600">
+                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-600'}`}>
                                                     {i + 1}
                                                 </div>
-                                                <span className="text-gray-900">{topic}</span>
+                                                <span>{topic}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -1108,10 +1121,10 @@ export default function SearchPods() {
                 {/* Categories Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {CATEGORIES.map((cat) => (
-                        <div key={cat.id} className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
+                        <div key={cat.id} className={`rounded-2xl border overflow-hidden shadow-sm ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                             {/* Category Header */}
                             <div
-                                className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50"
+                                className={`p-4 flex items-center justify-between cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                                 onClick={() => loadCategory(cat.id)}
                                 style={{ borderLeft: `4px solid ${cat.color}` }}
                             >
@@ -1123,11 +1136,11 @@ export default function SearchPods() {
                                         <cat.icon className="w-6 h-6" style={{ color: cat.color }} />
                                     </div>
                                     <div>
-                                        <h3 className="text-gray-900 font-bold">{cat.name}</h3>
-                                        <p className="text-gray-500 text-sm">{cat.episodes} episodes</p>
+                                        <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{cat.name}</h3>
+                                        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{cat.episodes} episodes</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-gray-500 hover:text-purple-600">
+                                <div className={`flex items-center gap-2 hover:text-purple-600 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                     {loadingCategory === cat.id ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
@@ -1150,7 +1163,7 @@ export default function SearchPods() {
                                                <button
                                                    key={i}
                                                    onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
-                                                   className="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
+                                                   className={`px-3 py-1.5 rounded-full text-sm hover:bg-purple-100 hover:text-purple-600 transition-all ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
                                                >
                                                    {sub}
                                                </button>
@@ -1158,7 +1171,7 @@ export default function SearchPods() {
                                            <button 
                                                onClick={(e) => { e.stopPropagation(); loadMoreSubtopics(cat.id); }}
                                                disabled={loadingMoreSubtopics === cat.id}
-                                               className="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
+                                               className={`px-3 py-1.5 rounded-full text-sm disabled:opacity-50 flex items-center gap-1 ${darkMode ? 'bg-gray-700 text-gray-300 hover:text-white' : 'bg-gray-100 text-gray-600 hover:text-gray-900'}`}
                                            >
                                                {loadingMoreSubtopics === cat.id ? (
                                                    <Loader2 className="w-3 h-3 animate-spin" />
@@ -1174,19 +1187,19 @@ export default function SearchPods() {
                                         <div
                                             key={i}
                                             onClick={() => playEpisode({ ...ep, category: cat.name })}
-                                            className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-purple-50 cursor-pointer group transition-all"
+                                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer group transition-all ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-purple-50'}`}
                                         >
-                                            <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
-                                                <Radio className="w-4 h-4 text-gray-400 group-hover:hidden" />
+                                            <div className={`w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                                                <Radio className={`w-4 h-4 group-hover:hidden ${darkMode ? 'text-gray-400' : 'text-gray-400'}`} />
                                                 <Play className="w-4 h-4 text-purple-600 hidden group-hover:block" fill="currentColor" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="text-gray-900 text-sm font-medium truncate">{ep.title}</h4>
+                                                <h4 className={`text-sm font-medium truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>{ep.title}</h4>
                                                 {ep.description && (
-                                                    <p className="text-gray-500 text-xs truncate">{ep.description}</p>
+                                                    <p className={`text-xs truncate ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{ep.description}</p>
                                                 )}
                                             </div>
-                                            <span className="text-gray-400 text-xs flex items-center gap-1">
+                                            <span className={`text-xs flex items-center gap-1 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                                                 <Clock className="w-3 h-3" /> 2m
                                             </span>
                                         </div>
@@ -1195,7 +1208,7 @@ export default function SearchPods() {
                                     {/* Generate More */}
                                     <button
                                         onClick={() => playEpisode({ title: `Latest in ${cat.name}`, category: cat.name })}
-                                        className="w-full py-3 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-600 flex items-center justify-center gap-2 text-sm transition-all"
+                                        className={`w-full py-3 rounded-xl border border-dashed hover:border-purple-300 hover:text-purple-600 flex items-center justify-center gap-2 text-sm transition-all ${darkMode ? 'border-gray-600 text-gray-400' : 'border-gray-300 text-gray-500'}`}
                                     >
                                         <Sparkles className="w-4 h-4" />
                                         Generate New Episode
@@ -1207,14 +1220,14 @@ export default function SearchPods() {
                 </div>
 
                 {/* Trending Section */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
+                <div className={`rounded-2xl border p-6 ${darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-purple-900' : 'bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-100'}`}>
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${darkMode ? 'bg-purple-900/50' : 'bg-purple-100'}`}>
                             <TrendingUp className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                            <span className="text-gray-900 font-bold text-2xl md:text-3xl">Trending Now</span>
-                            <p className="text-xs text-gray-500">Most popular podcasts</p>
+                            <span className={`font-bold text-2xl md:text-3xl ${darkMode ? 'text-white' : 'text-gray-900'}`}>Trending Now</span>
+                            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Most popular podcasts</p>
                         </div>
                     </div>
                     
@@ -1225,7 +1238,7 @@ export default function SearchPods() {
                                 <div
                                     key={i}
                                     onClick={() => playEpisode(item)}
-                                    className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
+                                    className={`relative flex items-center gap-3 p-4 rounded-xl cursor-pointer border group transition-all shadow-sm ${darkMode ? 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-purple-700' : 'bg-white hover:bg-purple-50 border-gray-100 hover:border-purple-200'}`}
                                 >
                                     <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
                                         {i + 1}
@@ -1237,8 +1250,8 @@ export default function SearchPods() {
                                         </div>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
-                                        <p className="text-gray-500 text-xs capitalize">{item.category}</p>
+                                        <h4 className={`text-sm font-medium truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>{item.title}</h4>
+                                        <p className={`text-xs capitalize ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{item.category}</p>
                                         <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
                                             <Users className="w-3 h-3" />
                                             {item.plays.toLocaleString()} plays
@@ -1249,17 +1262,39 @@ export default function SearchPods() {
                             );
                         })}
                     </div>
-                </div>
-            </main>
+                    </div>
+
+                    {/* Dark Mode Toggle */}
+                    <div className="max-w-7xl mx-auto px-4 md:px-6 pt-8 pb-4">
+                    <div className="flex items-center justify-center">
+                        <button
+                            onClick={() => setDarkMode(!darkMode)}
+                            className={`flex items-center gap-3 px-6 py-3 rounded-full border transition-all ${darkMode ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'}`}
+                        >
+                            {darkMode ? (
+                                <>
+                                    <Sun className="w-5 h-5 text-yellow-500" />
+                                    <span className="text-sm font-medium">Light Mode</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Moon className="w-5 h-5 text-purple-600" />
+                                    <span className="text-sm font-medium">Dark Mode</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                    </div>
+                    </main>
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-full md:max-w-lg p-0 bg-white border-gray-200 h-screen md:h-auto md:max-h-[90vh] overflow-y-auto [&>button]:hidden w-full md:w-auto rounded-none md:rounded-lg safe-area-inset" aria-describedby={undefined}>
+                <DialogContent className={`max-w-full md:max-w-lg p-0 h-screen md:h-auto md:max-h-[90vh] overflow-y-auto [&>button]:hidden w-full md:w-auto rounded-none md:rounded-lg safe-area-inset ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`} aria-describedby={undefined}>
                     <DialogTitle className="sr-only">Now Playing</DialogTitle>
                     <div className="p-4 md:p-6 pb-safe min-h-screen md:min-h-0 flex flex-col">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-4 md:mb-6">
-                            <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Now Playing</span>
+                            <span className={`text-xs md:text-sm uppercase tracking-wider ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Now Playing</span>
                             <button onClick={closePlayer} className="w-12 h-12 md:w-10 md:h-10 rounded-full bg-purple-600 hover:bg-purple-700 active:scale-95 flex items-center justify-center transition-all touch-manipulation">
                                 <X className="w-6 h-6 md:w-5 md:h-5 text-white" />
                             </button>
@@ -1342,15 +1377,15 @@ export default function SearchPods() {
 
                         {/* Title */}
                         <div className="text-center mb-3 md:mb-4 px-2 flex-shrink-0">
-                            <h2 className="text-gray-900 text-2xl md:text-xl font-bold mb-2 line-clamp-2">{currentEpisode?.title}</h2>
+                            <h2 className={`text-2xl md:text-xl font-bold mb-2 line-clamp-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{currentEpisode?.title}</h2>
                             <p className="text-purple-600 text-lg md:text-sm font-medium">{currentEpisode?.category}</p>
                         </div>
 
                         {/* Captions - fixed height for 3 lines */}
                         {!isGenerating && (
                             <div className="mb-4 md:mb-6">
-                                <div className="bg-gray-50 rounded-xl p-3 md:p-4 min-h-[84px] md:h-[84px] border border-gray-200 flex items-center justify-center overflow-hidden">
-                                    <p className="text-center leading-relaxed text-sm md:text-base text-gray-700 line-clamp-3">
+                                <div className={`rounded-xl p-3 md:p-4 min-h-[84px] md:h-[84px] border flex items-center justify-center overflow-hidden ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                                    <p className={`text-center leading-relaxed text-sm md:text-base line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                         {Array.isArray(captionWords) && captionWords.length > 0 && typeof captionWords[0] === 'object' ? (
                                             captionWords.map((wordObj, i) => (
                                                 <span key={i} className={wordObj.highlight ? 'text-purple-600 font-semibold transition-all duration-150' : 'transition-all duration-150'}>
@@ -1366,7 +1401,7 @@ export default function SearchPods() {
                                 <button
                                     onClick={extendPodcast}
                                     disabled={isExtending || isGenerating}
-                                    className="mt-2 w-full flex items-center justify-center gap-2 py-3 md:py-2 px-4 rounded-xl md:rounded-lg bg-purple-50 hover:bg-purple-100 active:scale-98 text-purple-600 text-base md:text-sm font-medium transition-all disabled:opacity-50 touch-manipulation"
+                                    className={`mt-2 w-full flex items-center justify-center gap-2 py-3 md:py-2 px-4 rounded-xl md:rounded-lg active:scale-98 text-purple-600 text-base md:text-sm font-medium transition-all disabled:opacity-50 touch-manipulation ${darkMode ? 'bg-purple-900/30 hover:bg-purple-900/50' : 'bg-purple-50 hover:bg-purple-100'}`}
                                 >
                                     {isExtending ? (
                                         <>
@@ -1386,7 +1421,7 @@ export default function SearchPods() {
                         {/* Progress - clickable timeline */}
                         <div className="mb-4 md:mb-6">
                             <div 
-                                className="relative h-3 md:h-2 bg-gray-200 rounded-full cursor-pointer group touch-manipulation"
+                                className={`relative h-3 md:h-2 rounded-full cursor-pointer group touch-manipulation ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}
                                 onClick={(e) => {
                                     if (!audioRef.current || !duration) return;
                                     const rect = e.currentTarget.getBoundingClientRect();
@@ -1403,7 +1438,7 @@ export default function SearchPods() {
                                     style={{ left: `calc(${(currentTime / (duration || 1)) * 100}% - ${window.innerWidth < 768 ? 8 : 6}px)` }}
                                 />
                             </div>
-                            <div className="flex justify-between text-xs text-gray-400 mt-2">
+                            <div className={`flex justify-between text-xs mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration)}</span>
                             </div>
@@ -1414,7 +1449,7 @@ export default function SearchPods() {
                             <button 
                                 onClick={skipBackward}
                                 disabled={isGenerating}
-                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
+                                className={`active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}
                             >
                                 <RotateCcw className="w-8 h-8 md:w-6 md:h-6" />
                                 <span className="text-sm md:text-xs mt-1 font-medium">15s</span>
@@ -1434,7 +1469,7 @@ export default function SearchPods() {
                             <button 
                                 onClick={skipForward}
                                 disabled={isGenerating}
-                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
+                                className={`active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}
                             >
                                 <RotateCw className="w-8 h-8 md:w-6 md:h-6" />
                                 <span className="text-sm md:text-xs mt-1 font-medium">30s</span>
@@ -1444,7 +1479,7 @@ export default function SearchPods() {
                         {/* Speed & Volume */}
                         <div className="flex flex-col md:flex-row items-stretch md:items-center md:justify-between mt-4 md:mt-6 gap-3 md:gap-4">
                         <div className="flex items-center gap-2 md:gap-2 justify-center md:justify-start">
-                            <button onClick={() => setIsMuted(!isMuted)} className="text-gray-500 hover:text-gray-700 active:scale-95 transition-transform p-2 touch-manipulation">
+                            <button onClick={() => setIsMuted(!isMuted)} className={`active:scale-95 transition-transform p-2 touch-manipulation ${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>
                                 {isMuted ? <VolumeX className="w-5 h-5 md:w-4 md:h-4" /> : <Volume2 className="w-5 h-5 md:w-4 md:h-4" />}
                             </button>
                             <Slider
@@ -1459,7 +1494,7 @@ export default function SearchPods() {
                                 }}
                                 className="w-24 md:w-20"
                             />
-                            <span className="text-xs text-gray-400 w-10 md:w-8">{volume}%</span>
+                            <span className={`text-xs w-10 md:w-8 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>{volume}%</span>
                         </div>
                         <div className="flex gap-2 md:gap-1 justify-center">
                             {[0.75, 1, 1.25, 1.5].map((speed) => (
@@ -1474,7 +1509,9 @@ export default function SearchPods() {
                                     className={`px-3 py-2 md:px-2 md:py-1 rounded-lg md:rounded text-sm md:text-xs transition-all active:scale-95 touch-manipulation ${
                                         playbackSpeed === speed
                                             ? 'bg-purple-600 text-white'
-                                            : 'text-gray-500 hover:bg-gray-100 bg-gray-50'
+                                            : darkMode 
+                                                ? 'text-gray-400 hover:bg-gray-700 bg-gray-800'
+                                                : 'text-gray-500 hover:bg-gray-100 bg-gray-50'
                                     }`}
                                 >
                                     {speed}x
@@ -1516,7 +1553,9 @@ export default function SearchPods() {
                                 className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium transition-all active:scale-[0.98] touch-manipulation shadow-sm ${
                                     showRecommendations 
                                         ? 'bg-purple-600 text-white border border-purple-700' 
-                                        : 'bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border border-purple-200 text-purple-700'
+                                        : darkMode
+                                            ? 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-purple-400'
+                                            : 'bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border border-purple-200 text-purple-700'
                                 } disabled:opacity-50`}
                             >
                                 <ListMusic className="w-5 h-5" />
@@ -1529,7 +1568,7 @@ export default function SearchPods() {
                                     {recommendations.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center py-8">
                                             <Loader2 className="w-6 h-6 text-purple-600 animate-spin mb-2" />
-                                            <p className="text-sm text-gray-500">Finding perfect matches...</p>
+                                            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Finding perfect matches...</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-3">
@@ -1540,14 +1579,14 @@ export default function SearchPods() {
                                                         setShowRecommendations(false);
                                                         playEpisode({ title: rec.title, category: rec.category });
                                                     }}
-                                                    className="w-full flex items-center gap-3 p-4 rounded-xl bg-white hover:bg-purple-50 active:bg-purple-100 border border-gray-200 hover:border-purple-300 transition-all text-left shadow-sm hover:shadow-md touch-manipulation"
+                                                    className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left shadow-sm hover:shadow-md touch-manipulation ${darkMode ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 hover:border-purple-700' : 'bg-white hover:bg-purple-50 active:bg-purple-100 border-gray-200 hover:border-purple-300'}`}
                                                 >
                                                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
                                                         <Radio className="w-6 h-6 text-white" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-semibold text-gray-900 mb-1">{rec.title}</p>
-                                                        <p className="text-xs text-gray-500">{rec.reason || rec.category}</p>
+                                                        <p className={`text-sm font-semibold mb-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{rec.title}</p>
+                                                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{rec.reason || rec.category}</p>
                                                     </div>
                                                     <Play className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" />
                                                 </button>
