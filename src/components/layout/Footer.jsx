@@ -8,7 +8,7 @@ export default function Footer() {
         <footer className="py-6 bg-white border-t border-gray-200">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <Link to={createPageUrl('Home')}>
+                    <Link to={createPageUrl('SearchPods')}>
                         <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale hover:grayscale-0 transition-all" />
                     </Link>
                     <nav className="flex flex-wrap justify-center gap-6 text-sm">

@@ -70,7 +70,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
             <div className="flex items-center justify-between px-4 h-full gap-4">
                 <div className="flex items-center gap-4 flex-shrink-0">
                     {/* Logo - hidden on mobile since it's in the sidebar */}
-                    <Link to={createPageUrl('Home')} className="hidden md:flex items-center gap-3 hover:opacity-80">
+                    <Link to={createPageUrl('SearchPods')} className="hidden md:flex items-center gap-3 hover:opacity-80">
                         <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                         <div className="hidden sm:block">
                             <span className="text-xl font-bold text-gray-900">1cPublishing</span>
