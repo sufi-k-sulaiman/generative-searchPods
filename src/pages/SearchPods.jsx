@@ -561,35 +561,38 @@ export default function SearchPods() {
                 loadRecommendations();
             }, 1000);
 
+            // Shared caption sync function
+            const updateCaptions = (currentTime, duration, sentencesArray) => {
+                if (sentencesArray.length === 0 || duration === 0) return;
+
+                const progress = currentTime / duration;
+                const sentenceIndex = Math.min(
+                    Math.floor(progress * sentencesArray.length),
+                    sentencesArray.length - 1
+                );
+                const currentSentence = sentencesArray[sentenceIndex];
+                setCurrentCaption(currentSentence);
+
+                // Calculate word-level progress within current sentence
+                const words = currentSentence.split(/\s+/);
+                const timePerSentence = duration / sentencesArray.length;
+                const sentenceStartTime = sentenceIndex * timePerSentence;
+                const timeIntoSentence = currentTime - sentenceStartTime;
+                const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
+
+                // Highlight 2-3 words at a time for smoother sync
+                const currentWordIndex = Math.floor(sentenceProgress * words.length);
+                const highlightedWords = words.map((word, i) => ({
+                    word,
+                    highlight: i >= currentWordIndex && i <= currentWordIndex + 1
+                }));
+
+                setCaptionWords(highlightedWords);
+            };
+
             audio.ontimeupdate = () => {
                 setCurrentTime(audio.currentTime);
-                // Update caption and words based on time with better sync
-                if (sentences.length > 0 && audio.duration > 0) {
-                    const progress = audio.currentTime / audio.duration;
-                    const sentenceIndex = Math.min(
-                        Math.floor(progress * sentences.length),
-                        sentences.length - 1
-                    );
-                    const currentSentence = sentences[sentenceIndex];
-                    setCurrentCaption(currentSentence);
-
-                    // Calculate word-level progress within current sentence
-                    const words = currentSentence.split(/\s+/);
-                    const timePerSentence = audio.duration / sentences.length;
-                    const sentenceStartTime = sentenceIndex * timePerSentence;
-                    const timeIntoSentence = audio.currentTime - sentenceStartTime;
-                    const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
-
-                    // Highlight 2-3 words at a time for smoother sync
-                    const totalWords = words.length;
-                    const currentWordIndex = Math.floor(sentenceProgress * totalWords);
-                    const highlightedWords = words.map((word, i) => ({
-                        word,
-                        highlight: i >= currentWordIndex && i <= currentWordIndex + 1
-                    }));
-
-                    setCaptionWords(highlightedWords);
-                }
+                updateCaptions(audio.currentTime, audio.duration, sentences);
             };
 
             audio.onended = () => {
@@ -816,14 +819,29 @@ export default function SearchPods() {
                 
                 audio.ontimeupdate = () => {
                     setCurrentTime(audio.currentTime);
+                    // Use same caption sync logic for voice swap
                     if (remainingSentences.length > 0 && audio.duration > 0) {
                         const progress = audio.currentTime / audio.duration;
                         const sentenceIndex = Math.min(
                             Math.floor(progress * remainingSentences.length),
                             remainingSentences.length - 1
                         );
-                        setCurrentCaption(remainingSentences[sentenceIndex]);
-                        setCaptionWords(remainingSentences[sentenceIndex].split(/\s+/));
+                        const currentSentence = remainingSentences[sentenceIndex];
+                        setCurrentCaption(currentSentence);
+
+                        const words = currentSentence.split(/\s+/);
+                        const timePerSentence = audio.duration / remainingSentences.length;
+                        const sentenceStartTime = sentenceIndex * timePerSentence;
+                        const timeIntoSentence = audio.currentTime - sentenceStartTime;
+                        const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
+
+                        const currentWordIndex = Math.floor(sentenceProgress * words.length);
+                        const highlightedWords = words.map((word, i) => ({
+                            word,
+                            highlight: i >= currentWordIndex && i <= currentWordIndex + 1
+                        }));
+
+                        setCaptionWords(highlightedWords);
                     }
                 };
                 
@@ -936,14 +954,29 @@ export default function SearchPods() {
 
                 audio.ontimeupdate = () => {
                     setCurrentTime(audio.currentTime);
+                    // Use same caption sync logic
                     if (allSentences.length > 0 && audio.duration > 0) {
                         const progress = audio.currentTime / audio.duration;
                         const sentenceIndex = Math.min(
                             Math.floor(progress * allSentences.length),
                             allSentences.length - 1
                         );
-                        setCurrentCaption(allSentences[sentenceIndex]);
-                        setCaptionWords(allSentences[sentenceIndex].split(/\s+/));
+                        const currentSentence = allSentences[sentenceIndex];
+                        setCurrentCaption(currentSentence);
+
+                        const words = currentSentence.split(/\s+/);
+                        const timePerSentence = audio.duration / allSentences.length;
+                        const sentenceStartTime = sentenceIndex * timePerSentence;
+                        const timeIntoSentence = audio.currentTime - sentenceStartTime;
+                        const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
+
+                        const currentWordIndex = Math.floor(sentenceProgress * words.length);
+                        const highlightedWords = words.map((word, i) => ({
+                            word,
+                            highlight: i >= currentWordIndex && i <= currentWordIndex + 1
+                        }));
+
+                        setCaptionWords(highlightedWords);
                     }
                 };
 
