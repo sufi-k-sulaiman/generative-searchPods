@@ -149,6 +149,7 @@ export default function SearchPods() {
     const [showBraille, setShowBraille] = useState(false);
     const [isExtending, setIsExtending] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
+    const [loadingMoreSubtopics, setLoadingMoreSubtopics] = useState(null);
     
     // Refs for audio playback
     const sentencesRef = useRef([]);
@@ -231,6 +232,36 @@ export default function SearchPods() {
             console.error('Error loading category:', error);
         } finally {
             setLoadingCategory(null);
+        }
+    };
+
+    // Load more subtopics
+    const loadMoreSubtopics = async (categoryId) => {
+        setLoadingMoreSubtopics(categoryId);
+        
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Generate 6 more unique subtopics for the "${categoryId}" category. Make them different from typical suggestions.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        subtopics: { type: "array", items: { type: "string" } }
+                    }
+                }
+            });
+            
+            setCategoryData(prev => ({
+                ...prev,
+                [categoryId]: {
+                    ...prev[categoryId],
+                    subtopics: [...(prev[categoryId]?.subtopics || []), ...(response?.subtopics || [])]
+                }
+            }));
+        } catch (error) {
+            console.error('Error loading more subtopics:', error);
+        } finally {
+            setLoadingMoreSubtopics(null);
         }
     };
 
@@ -909,8 +940,16 @@ export default function SearchPods() {
                                                     {sub}
                                                 </button>
                                             ))}
-                                            <button className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 flex items-center gap-1">
-                                                <Plus className="w-3 h-3" /> Subtopics
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); loadMoreSubtopics(cat.id); }}
+                                                disabled={loadingMoreSubtopics === cat.id}
+                                                className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
+                                            >
+                                                {loadingMoreSubtopics === cat.id ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    <Plus className="w-3 h-3" />
+                                                )} Subtopics
                                             </button>
                                         </div>
                                     )}
