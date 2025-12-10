@@ -151,7 +151,7 @@ export default function SearchPods() {
     const [currentCaption, setCurrentCaption] = useState('');
     const [captionWords, setCaptionWords] = useState([]);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const [selectedVoice, setSelectedVoice] = useState('EXAVITQu4vr4xnSDxMaL');
+    const [selectedVoice, setSelectedVoice] = useState('en-GB-Wavenet-A');
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [showEqualizer, setShowEqualizer] = useState(false);
@@ -242,12 +242,12 @@ export default function SearchPods() {
         return () => clearTimeout(debounce);
     }, [searchQuery]);
 
-    // Voice mappings
+    // Voice mappings - Google Cloud TTS voices
             const voiceOptions = [
-                { id: 'Google UK English Female', label: 'Bella', lang: 'en-GB' },
-                { id: 'Google US English', label: 'Rachel', lang: 'en-US' },
-                { id: 'Microsoft Zira - English (United States)', label: 'Domi', lang: 'en-US' },
-                { id: 'Google UK English Male', label: 'Elli', lang: 'en-GB' },
+                { id: 'en-GB-Wavenet-A', label: 'Bella', lang: 'en-GB' },
+                { id: 'en-US-Wavenet-C', label: 'Rachel', lang: 'en-US' },
+                { id: 'en-US-Wavenet-F', label: 'Domi', lang: 'en-US' },
+                { id: 'en-GB-Wavenet-B', label: 'Elli', lang: 'en-GB' },
             ];
 
     // Cleanup audio on unmount

@@ -1,51 +1,51 @@
-// Google Translate TTS (free, unofficial)
-async function googleTranslateTTS(text, lang = 'en') {
-    const maxLength = 200;
-    const chunks = [];
-    
-    // Split text into chunks
-    let remaining = text;
-    while (remaining.length > 0) {
-        if (remaining.length <= maxLength) {
-            chunks.push(remaining);
-            break;
-        }
-        let splitIndex = remaining.lastIndexOf(' ', maxLength);
-        if (splitIndex === -1) splitIndex = maxLength;
-        chunks.push(remaining.substring(0, splitIndex));
-        remaining = remaining.substring(splitIndex).trim();
+// Google Cloud TTS
+async function googleCloudTTS(text, voiceId = 'en-GB-Wavenet-A') {
+    const apiKey = Deno.env.get('GOOGLE_CLOUD_API_KEY');
+    if (!apiKey) {
+        throw new Error('Google Cloud API key not configured');
     }
     
-    const audioBuffers = [];
+    const languageCode = voiceId.substring(0, 5); // e.g., 'en-GB'
     
-    for (const chunk of chunks) {
-        const encodedText = encodeURIComponent(chunk);
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodedText}&tl=${lang}&client=tw-ob`;
-        
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            input: { text: text },
+            voice: {
+                languageCode: languageCode,
+                name: voiceId
+            },
+            audioConfig: {
+                audioEncoding: 'MP3',
+                pitch: 0,
+                speakingRate: 1.0
             }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Google TTS failed: ${response.status}`);
-        }
-        
-        const buffer = await response.arrayBuffer();
-        audioBuffers.push(new Uint8Array(buffer));
+        })
+    });
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Google Cloud TTS failed: ${response.status} - ${errorText}`);
     }
     
-    // Combine all chunks
-    const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.length, 0);
-    const combined = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const buf of audioBuffers) {
-        combined.set(buf, offset);
-        offset += buf.length;
+    const result = await response.json();
+    
+    // Google returns base64 audio in audioContent field
+    if (!result.audioContent) {
+        throw new Error('No audio content in Google TTS response');
     }
     
-    return combined;
+    // Decode base64 to bytes
+    const binaryString = atob(result.audioContent);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    return bytes;
 }
 
 // ElevenLabs TTS
@@ -168,61 +168,54 @@ Deno.serve(async (req) => {
         let audioBytes;
         let usedService = '';
         const errors = [];
-        
-        // Try ElevenLabs first if voice_id is provided AND API key exists
-        const hasElevenLabsKey = Deno.env.get('ELEVENLABS_API_KEY');
-        if (voice_id && hasElevenLabsKey) {
+
+        // Try Google Cloud TTS first if voice_id is provided
+        if (voice_id && voice_id.includes('Wavenet')) {
             try {
-                console.log('Trying ElevenLabs TTS with voice:', voice_id);
-                audioBytes = await elevenLabsTTS(text, voice_id);
-                usedService = 'elevenlabs';
-                console.log('ElevenLabs TTS succeeded');
-            } catch (elevenError) {
-                console.log('ElevenLabs TTS failed:', elevenError.message);
-                errors.push(`ElevenLabs: ${elevenError.message}`);
+                console.log('Trying Google Cloud TTS with voice:', voice_id);
+                audioBytes = await googleCloudTTS(text, voice_id);
+                usedService = 'google-cloud';
+                console.log('Google Cloud TTS succeeded');
+            } catch (googleError) {
+                console.log('Google Cloud TTS failed:', googleError.message);
+                errors.push(`Google Cloud: ${googleError.message}`);
             }
         }
-        
-        // If no ElevenLabs or different voices needed, use Web Speech API on client
-        if (!audioBytes && voice_id) {
-            console.log('Using Web Speech API for voice selection');
-            return Response.json({ 
-                useWebSpeech: true,
-                text: text,
-                lang: lang,
-                voiceId: voice_id
-            });
+
+        // Try ElevenLabs if voice_id starts with EX (ElevenLabs ID format)
+        if (!audioBytes && voice_id && voice_id.startsWith('EX')) {
+            const hasElevenLabsKey = Deno.env.get('ELEVENLABS_API_KEY');
+            if (hasElevenLabsKey) {
+                try {
+                    console.log('Trying ElevenLabs TTS with voice:', voice_id);
+                    audioBytes = await elevenLabsTTS(text, voice_id);
+                    usedService = 'elevenlabs';
+                    console.log('ElevenLabs TTS succeeded');
+                } catch (elevenError) {
+                    console.log('ElevenLabs TTS failed:', elevenError.message);
+                    errors.push(`ElevenLabs: ${elevenError.message}`);
+                }
+            }
         }
-        
-        // Otherwise try Google Translate TTS
+
+        // Try EdgeTTS as fallback
         if (!audioBytes) {
             try {
-                console.log('Trying Google Translate TTS...');
-                audioBytes = await googleTranslateTTS(text, lang.split('-')[0]);
-                usedService = 'google';
-                console.log('Google Translate TTS succeeded');
-            } catch (googleError) {
-                console.log('Google Translate TTS failed:', googleError.message);
-                errors.push(`Google: ${googleError.message}`);
-                
-                // Try EdgeTTS
-                try {
-                    console.log('Trying EdgeTTS...');
-                    audioBytes = await edgeTTS(text, lang);
-                    usedService = 'edge';
-                    console.log('EdgeTTS succeeded');
-                } catch (edgeError) {
-                    console.log('EdgeTTS failed:', edgeError.message);
-                    errors.push(`Edge: ${edgeError.message}`);
-                    
-                    // Return signal to use Web Speech API on client
-                    return Response.json({ 
-                        useWebSpeech: true,
-                        text: text,
-                        lang: lang,
-                        errors: errors
-                    });
-                }
+                console.log('Trying EdgeTTS...');
+                audioBytes = await edgeTTS(text, lang);
+                usedService = 'edge';
+                console.log('EdgeTTS succeeded');
+            } catch (edgeError) {
+                console.log('EdgeTTS failed:', edgeError.message);
+                errors.push(`Edge: ${edgeError.message}`);
+
+                // Return signal to use Web Speech API on client
+                return Response.json({ 
+                    useWebSpeech: true,
+                    text: text,
+                    lang: lang,
+                    errors: errors
+                });
             }
         }
         
