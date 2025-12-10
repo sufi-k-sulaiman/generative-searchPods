@@ -357,6 +357,8 @@ export default function SearchPods() {
             URL.revokeObjectURL(audioUrlRef.current);
             audioUrlRef.current = null;
         }
+        // Cancel any ongoing Web Speech API speech
+        speechSynthesis.cancel();
 
         setCurrentEpisode(episode);
         setShowPlayer(true);
