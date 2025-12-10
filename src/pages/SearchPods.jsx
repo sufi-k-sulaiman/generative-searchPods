@@ -198,9 +198,12 @@ export default function SearchPods() {
         setLoadingCategory(categoryId);
         setExpandedCategory(categoryId);
         
+        const category = CATEGORIES.find(c => c.id === categoryId);
+        const episodeCount = category?.episodes || 8;
+        
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 4 podcast episode ideas for the "${categoryId}" category. Each should have a compelling title and brief description. Also suggest 4 subtopics for filtering.`,
+                prompt: `Generate ${episodeCount} podcast episode ideas for the "${categoryId}" category. Each should have a compelling title and brief description. Also suggest 6 subtopics for filtering.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -932,29 +935,29 @@ export default function SearchPods() {
                                 <div className="p-4 pt-0 space-y-3">
                                     {/* Subtopic Filters */}
                                     {categoryData[cat.id].subtopics?.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 py-2">
-                                            <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-600">All</span>
-                                            {categoryData[cat.id].subtopics.slice(0, 3).map((sub, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
-                                                    className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
-                                                >
-                                                    {sub}
-                                                </button>
-                                            ))}
-                                            <button 
-                                                onClick={(e) => { e.stopPropagation(); loadMoreSubtopics(cat.id); }}
-                                                disabled={loadingMoreSubtopics === cat.id}
-                                                className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                {loadingMoreSubtopics === cat.id ? (
-                                                    <Loader2 className="w-3 h-3 animate-spin" />
-                                                ) : (
-                                                    <Plus className="w-3 h-3" />
-                                                )} Subtopics
-                                            </button>
-                                        </div>
+                                       <div className="flex flex-wrap gap-2 py-2">
+                                           <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-600">All</span>
+                                           {categoryData[cat.id].subtopics.map((sub, i) => (
+                                               <button
+                                                   key={i}
+                                                   onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
+                                                   className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
+                                               >
+                                                   {sub}
+                                               </button>
+                                           ))}
+                                           <button 
+                                               onClick={(e) => { e.stopPropagation(); loadMoreSubtopics(cat.id); }}
+                                               disabled={loadingMoreSubtopics === cat.id}
+                                               className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
+                                           >
+                                               {loadingMoreSubtopics === cat.id ? (
+                                                   <Loader2 className="w-3 h-3 animate-spin" />
+                                               ) : (
+                                                   <Plus className="w-3 h-3" />
+                                               )} More
+                                           </button>
+                                       </div>
                                     )}
 
                                     {/* Episodes */}
