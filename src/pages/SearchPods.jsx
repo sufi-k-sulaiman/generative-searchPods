@@ -821,48 +821,6 @@ export default function SearchPods() {
         <div className="min-h-screen bg-gray-50 pb-8">
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
 
-                {/* Trending Section */}
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                            <Radio className="w-5 h-5 text-purple-600" />
-                        </div>
-                        <div>
-                            <span className="text-gray-900 font-bold text-2xl md:text-3xl">SearchPods</span>
-                            <p className="text-xs text-gray-500">Generative Podcast</p>
-                        </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {trending.map((item, i) => (
-                            <div
-                                key={i}
-                                onClick={() => playEpisode(item)}
-                                className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
-                            >
-                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                                    {i + 1}
-                                </div>
-                                <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                        <Play className="w-4 h-4 text-white" fill="white" />
-                                    </div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
-                                    <p className="text-gray-500 text-xs capitalize">{item.category}</p>
-                                    <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
-                                        <Users className="w-3 h-3" />
-                                        {item.plays.toLocaleString()} plays
-                                    </div>
-                                </div>
-                                <AnimatedBars isPlaying={true} color="#7c3aed" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
                 {/* Search & Generate */}
                 <div className="space-y-4">
                     <form onSubmit={handleSearch} className="relative">
@@ -998,7 +956,7 @@ export default function SearchPods() {
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                            <Radio className="w-5 h-5 text-purple-600" />
+                            <TrendingUp className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
                             <span className="text-gray-900 font-bold text-2xl md:text-3xl">Trending Now</span>
