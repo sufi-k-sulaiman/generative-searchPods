@@ -995,7 +995,7 @@ export default function SearchPods() {
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 max-h-[90vh] overflow-y-auto [&>button]:hidden" aria-describedby={undefined}>
+                <DialogContent className="max-w-full md:max-w-lg p-0 bg-white border-gray-200 h-screen md:h-auto md:max-h-[90vh] overflow-y-auto [&>button]:hidden w-full md:w-auto rounded-none md:rounded-lg" aria-describedby={undefined}>
                     <DialogTitle className="sr-only">Now Playing</DialogTitle>
                     <div className="p-6">
                         {/* Header */}
