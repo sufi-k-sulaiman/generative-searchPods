@@ -516,10 +516,22 @@ export default function SearchPods() {
 
                 const utterance = new SpeechSynthesisUtterance(cleanText);
 
-                // Find and set the selected voice
+                // Find and set the selected voice with flexible matching
                 const voiceConfig = voiceOptions.find(v => v.id === selectedVoice);
                 if (voiceConfig) {
-                    const selectedVoiceObj = voices.find(v => v.name === voiceConfig.id);
+                    // Try exact match first
+                    let selectedVoiceObj = voices.find(v => v.name === voiceConfig.id);
+
+                    // If not found, try partial match based on keywords
+                    if (!selectedVoiceObj) {
+                        const keywords = voiceConfig.id.toLowerCase().split(' ');
+                        selectedVoiceObj = voices.find(v => {
+                            const nameLower = v.name.toLowerCase();
+                            return keywords.some(keyword => nameLower.includes(keyword)) && 
+                                   v.lang.startsWith(voiceConfig.lang.split('-')[0]);
+                        });
+                    }
+
                     if (selectedVoiceObj) {
                         utterance.voice = selectedVoiceObj;
                         utterance.lang = selectedVoiceObj.lang;
