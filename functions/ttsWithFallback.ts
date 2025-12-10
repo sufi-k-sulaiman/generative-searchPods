@@ -169,8 +169,9 @@ Deno.serve(async (req) => {
         let usedService = '';
         const errors = [];
         
-        // Try ElevenLabs first if voice_id is provided
-        if (voice_id) {
+        // Try ElevenLabs first if voice_id is provided AND API key exists
+        const hasElevenLabsKey = Deno.env.get('ELEVENLABS_API_KEY');
+        if (voice_id && hasElevenLabsKey) {
             try {
                 console.log('Trying ElevenLabs TTS with voice:', voice_id);
                 audioBytes = await elevenLabsTTS(text, voice_id);
@@ -182,7 +183,18 @@ Deno.serve(async (req) => {
             }
         }
         
-        // If ElevenLabs failed or no voice_id, try Google Translate TTS
+        // If no ElevenLabs or different voices needed, use Web Speech API on client
+        if (!audioBytes && voice_id) {
+            console.log('Using Web Speech API for voice selection');
+            return Response.json({ 
+                useWebSpeech: true,
+                text: text,
+                lang: lang,
+                voiceId: voice_id
+            });
+        }
+        
+        // Otherwise try Google Translate TTS
         if (!audioBytes) {
             try {
                 console.log('Trying Google Translate TTS...');

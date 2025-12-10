@@ -242,12 +242,12 @@ export default function SearchPods() {
         return () => clearTimeout(debounce);
     }, [searchQuery]);
 
-    // ElevenLabs voice IDs
-            const elevenLabsVoices = [
-                { id: 'EXAVITQu4vr4xnSDxMaL', label: 'Bella' },
-                { id: '21m00Tcm4TlvDq8ikWAM', label: 'Rachel' },
-                { id: 'AZnzlk1XvdvUeBnXmlld', label: 'Domi' },
-                { id: 'MF3mGyEYCl7XYWbV9V6O', label: 'Elli' },
+    // Voice mappings
+            const voiceOptions = [
+                { id: 'Google UK English Female', label: 'Bella', lang: 'en-GB' },
+                { id: 'Google US English', label: 'Rachel', lang: 'en-US' },
+                { id: 'Microsoft Zira - English (United States)', label: 'Domi', lang: 'en-US' },
+                { id: 'Google UK English Male', label: 'Elli', lang: 'en-GB' },
             ];
 
     // Cleanup audio on unmount
@@ -505,7 +505,15 @@ export default function SearchPods() {
             if (ttsResponse?.data?.useWebSpeech) {
                 console.log('Using Web Speech API fallback');
                 const utterance = new SpeechSynthesisUtterance(cleanText);
-                utterance.lang = 'en-GB';
+
+                // Find and set the selected voice
+                const voices = speechSynthesis.getVoices();
+                const voiceConfig = voiceOptions.find(v => v.id === selectedVoice);
+                const selectedVoiceObj = voices.find(v => v.name.includes(voiceConfig?.label || 'Google'));
+                if (selectedVoiceObj) {
+                    utterance.voice = selectedVoiceObj;
+                }
+                utterance.lang = voiceConfig?.lang || 'en-GB';
                 utterance.rate = 1;
                 
                 let wordIndex = 0;
@@ -1524,9 +1532,9 @@ export default function SearchPods() {
                         </div>
                         </div>
 
-                        {/* Voice Selection - ElevenLabs Voices */}
+                        {/* Voice Selection */}
                         <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">
-                        {elevenLabsVoices.map((voice) => (
+                        {voiceOptions.map((voice) => (
                             <button
                                 key={voice.id}
                                 onClick={() => swapVoice(voice.id)}
