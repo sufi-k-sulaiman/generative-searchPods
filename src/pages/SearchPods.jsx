@@ -51,24 +51,27 @@ const CATEGORIES = [
 
 const QUICK_TOPICS = ['AI trends', 'Morning motivation', 'Sleep story', 'Health tips', 'World news', 'Book summary'];
 
-const ALL_TRENDING = [
-    { title: 'The Psychology of Happiness', category: 'Psychology', plays: 3421, image: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?w=400&h=400&fit=crop' },
-    { title: 'The Science of Learning', category: 'Education', plays: 3156, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=400&fit=crop' },
-    { title: 'AI Revolution in Industries', category: 'Technology', plays: 2847, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop' },
-    { title: 'Startup Playbook', category: 'Startups', plays: 2789, image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=400&fit=crop' },
-    { title: 'Investment Basics', category: 'Finance', plays: 2567, image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=400&fit=crop' },
-    { title: 'Peak Performance', category: 'Sports', plays: 2567, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop' },
-    { title: 'Mindfulness Meditation', category: 'Wellness', plays: 2234, image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=400&fit=crop' },
-    { title: 'Creative Writing Tips', category: 'Arts', plays: 1987, image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop' },
-    { title: 'Healthy Eating Habits', category: 'Health', plays: 2654, image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=400&fit=crop' },
-    { title: 'Leadership Skills', category: 'Business', plays: 2345, image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop' },
-    { title: 'Space Exploration', category: 'Science', plays: 2890, image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=400&fit=crop' },
-    { title: 'Music Theory Basics', category: 'Music', plays: 1756, image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop' },
-];
-
 const getRandomTrending = () => {
-    const shuffled = [...ALL_TRENDING].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 6);
+    const items = [];
+    const shuffledCategories = [...CATEGORIES].sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < 6; i++) {
+        const cat = shuffledCategories[i % shuffledCategories.length];
+        const subtopics = [
+            'Latest Insights', 'Deep Dive', 'Expert Tips', 'Case Studies', 
+            'Success Stories', 'Common Mistakes', 'Future Trends', 'Best Practices'
+        ];
+        const randomSubtopic = subtopics[Math.floor(Math.random() * subtopics.length)];
+
+        items.push({
+            title: `${cat.name}: ${randomSubtopic}`,
+            category: cat.name,
+            plays: Math.floor(Math.random() * 3000) + 1500,
+            image: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=400&h=400&fit=crop'
+        });
+    }
+
+    return items;
 };
 
 // Clean text for speech synthesis
@@ -643,7 +646,8 @@ export default function SearchPods() {
 
     // Load recommendations based on current episode
     const loadRecommendations = async () => {
-        if (!currentEpisode || recommendations.length > 0) return;
+        if (!currentEpisode) return;
+        if (recommendations.length > 0) return;
 
         try {
             const response = await base44.integrations.Core.InvokeLLM({
@@ -906,7 +910,7 @@ export default function SearchPods() {
             <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center gap-3">
                     <img src={LOGO_URL} alt="SearchPods" className="h-7 object-contain" />
-                    <span className="text-2xl font-bold text-gray-900">SearchPods</span>
+                    <span className="text-sm font-bold text-gray-900">SearchPods</span>
                 </div>
             </div>
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
@@ -1349,7 +1353,7 @@ export default function SearchPods() {
                         {/* Recommendations Button - More Prominent */}
                         <div className="mt-3 md:mt-4 pb-2">
                             <button 
-                                onClick={loadRecommendations}
+                                onClick={() => setShowRecommendations(!showRecommendations)}
                                 disabled={isGenerating}
                                 className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium transition-all active:scale-[0.98] touch-manipulation shadow-sm ${
                                     showRecommendations 
