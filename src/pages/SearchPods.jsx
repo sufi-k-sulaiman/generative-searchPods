@@ -371,6 +371,7 @@ export default function SearchPods() {
         setImageLoading(true);
         setCurrentCaption('Generating audio...');
         setCaptionWords([]);
+        setExtendedCount(0);
 
         // Generate image with logo watermark
         base44.integrations.Core.GenerateImage({
