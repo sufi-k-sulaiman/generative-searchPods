@@ -375,12 +375,12 @@ export default function SearchPods() {
                 // Draw image
                 ctx.drawImage(img, 0, 0);
 
-                // Add semi-transparent logo watermark
+                // Add semi-transparent logo watermark in center
                 const logo = new Image();
                 logo.crossOrigin = 'anonymous';
                 logo.onload = () => {
-                    ctx.globalAlpha = 0.15;
-                    const logoSize = Math.min(canvas.width, canvas.height) * 0.3;
+                    ctx.globalAlpha = 0.2;
+                    const logoSize = Math.min(canvas.width, canvas.height) * 0.25;
                     const x = (canvas.width - logoSize) / 2;
                     const y = (canvas.height - logoSize) / 2;
                     ctx.drawImage(logo, x, y, logoSize, logoSize);
@@ -554,9 +554,12 @@ export default function SearchPods() {
             // Set up audio events
             audio.onloadedmetadata = () => {
                 setDuration(audio.duration);
-                // Preload recommendations once audio is loaded
-                loadRecommendations();
             };
+
+            // Load recommendations after a short delay
+            setTimeout(() => {
+                loadRecommendations();
+            }, 1000);
 
             audio.ontimeupdate = () => {
                 setCurrentTime(audio.currentTime);
@@ -704,7 +707,7 @@ export default function SearchPods() {
     };
 
     // Load recommendations based on current episode
-    const loadRecommendations = async () => {
+    const loadRecommendations = useCallback(async () => {
         if (!currentEpisode) return;
         if (recommendations.length > 0) return;
 
@@ -736,7 +739,7 @@ export default function SearchPods() {
                 { title: 'Trending Now', category: 'Popular', reason: 'What others are listening to' }
             ]);
         }
-    };
+    }, [currentEpisode, recommendations.length]);
 
     const [extendedCount, setExtendedCount] = useState(0);
     const [isSwappingVoice, setIsSwappingVoice] = useState(false);
@@ -999,46 +1002,58 @@ export default function SearchPods() {
                         </button>
 
                         {/* Type-ahead suggestions */}
-                        {showSuggestions && suggestions.length > 0 && (
+                        {showSuggestions && searchQuery.trim() && (
                             <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden z-50">
-                                {suggestions.map((suggestion, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => {
-                                            setSearchQuery(suggestion);
-                                            setShowSuggestions(false);
-                                        }}
-                                        className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
-                                    >
-                                        <Sparkles className="w-4 h-4 text-purple-600" />
-                                        <span className="text-gray-900">{suggestion}</span>
-                                    </button>
-                                ))}
+                                {/* Suggestions Tab */}
+                                {suggestions.length > 0 && (
+                                    <div className="border-b border-gray-200">
+                                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Suggestions
+                                        </div>
+                                        {suggestions.map((suggestion, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => {
+                                                    setSearchQuery(suggestion);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                            >
+                                                <Sparkles className="w-4 h-4 text-purple-600" />
+                                                <span className="text-gray-900">{suggestion}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Trending Tab */}
+                                {trendingTopics.length > 0 && (
+                                    <div>
+                                        <div className="px-4 py-2 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                                            <TrendingUp className="w-3 h-3" />
+                                            Trending Now
+                                        </div>
+                                        {trendingTopics.slice(0, 6).map((topic, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => {
+                                                    setSearchQuery(topic);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                            >
+                                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 flex items-center justify-center text-xs font-bold text-purple-600">
+                                                    {i + 1}
+                                                </div>
+                                                <span className="text-gray-900">{topic}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
-                    </form>
-
-                    {/* Trending search topics - shown when typing */}
-                    {searchQuery.trim() && trendingTopics.length > 0 && (
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-gray-400 text-sm flex items-center gap-1">
-                                <TrendingUp className="w-3 h-3" />
-                                Trending:
-                            </span>
-                            {trendingTopics.slice(0, 6).map((topic, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => {
-                                        setSearchQuery(topic);
-                                    }}
-                                    className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 hover:from-purple-200 hover:to-indigo-200 text-purple-700 text-sm transition-all font-medium"
-                                >
-                                    {topic}
-                                </button>
-                            ))}
+                        </form>
                         </div>
-                    )}
-                </div>
 
                 {/* Categories Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1080,12 +1095,12 @@ export default function SearchPods() {
                                     {/* Subtopic Filters */}
                                     {categoryData[cat.id].subtopics?.length > 0 && (
                                        <div className="flex flex-wrap gap-2 py-2">
-                                           <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-600">All</span>
+                                           <span className="px-3 py-1.5 rounded-full text-sm bg-purple-100 text-purple-600">All</span>
                                            {categoryData[cat.id].subtopics.map((sub, i) => (
                                                <button
                                                    key={i}
                                                    onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
-                                                   className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
+                                                   className="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
                                                >
                                                    {sub}
                                                </button>
@@ -1093,7 +1108,7 @@ export default function SearchPods() {
                                            <button 
                                                onClick={(e) => { e.stopPropagation(); loadMoreSubtopics(cat.id); }}
                                                disabled={loadingMoreSubtopics === cat.id}
-                                               className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
+                                               className="px-3 py-1.5 rounded-full text-sm bg-gray-100 text-gray-600 hover:text-gray-900 disabled:opacity-50 flex items-center gap-1"
                                            >
                                                {loadingMoreSubtopics === cat.id ? (
                                                    <Loader2 className="w-3 h-3 animate-spin" />
