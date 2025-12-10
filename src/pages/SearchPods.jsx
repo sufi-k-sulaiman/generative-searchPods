@@ -4,7 +4,9 @@ import {
     Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music,
     Sparkles, Radio, Loader2, TrendingUp, Users, Mic, ChevronDown,
     ChevronRight, X, Clock, Plus, AlertTriangle, RotateCcw, RotateCw,
-    ListMusic, Sliders, Eye, MessageSquarePlus
+    ListMusic, Sliders, Eye, MessageSquarePlus, Heart, Shield, Zap,
+    Target, Sprout, Mountain, Award, Flame, Gift, Sun, Focus,
+    BookOpen, Brain, Compass, Scale, Lightbulb, Rocket, Star
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,36 +16,36 @@ import { Progress } from "@/components/ui/progress";
 import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
 
 const CATEGORIES = [
-    { id: 'hope', name: 'Hope', color: '#10B981', episodes: 8 },
-    { id: 'courage', name: 'Courage', color: '#EF4444', episodes: 10 },
-    { id: 'confidence', name: 'Confidence', color: '#F59E0B', episodes: 9 },
-    { id: 'success', name: 'Success', color: '#8B5CF6', episodes: 12 },
-    { id: 'growth', name: 'Growth', color: '#22C55E', episodes: 11 },
-    { id: 'resilience', name: 'Resilience', color: '#3B82F6', episodes: 8 },
-    { id: 'determination', name: 'Determination', color: '#DC2626', episodes: 9 },
-    { id: 'passion', name: 'Passion', color: '#EC4899', episodes: 7 },
-    { id: 'gratitude', name: 'Gratitude', color: '#F97316', episodes: 10 },
-    { id: 'optimism', name: 'Optimism', color: '#FBBF24', episodes: 8 },
-    { id: 'focus', name: 'Focus', color: '#6366F1', episodes: 9 },
-    { id: 'discipline', name: 'Discipline', color: '#64748B', episodes: 11 },
-    { id: 'mindfulness', name: 'Mindfulness', color: '#14B8A6', episodes: 10 },
-    { id: 'vision', name: 'Vision', color: '#A855F7', episodes: 7 },
-    { id: 'purpose', name: 'Purpose', color: '#0EA5E9', episodes: 9 },
-    { id: 'balance', name: 'Balance', color: '#84CC16', episodes: 8 },
-    { id: 'clarity', name: 'Clarity', color: '#06B6D4', episodes: 7 },
-    { id: 'drive', name: 'Drive', color: '#E11D48', episodes: 10 },
-    { id: 'ambition', name: 'Ambition', color: '#7C3AED', episodes: 9 },
-    { id: 'persistence', name: 'Persistence', color: '#059669', episodes: 8 },
-    { id: 'momentum', name: 'Momentum', color: '#2563EB', episodes: 7 },
-    { id: 'progress', name: 'Progress', color: '#16A34A', episodes: 11 },
-    { id: 'breakthrough', name: 'Breakthrough', color: '#D946EF', episodes: 6 },
-    { id: 'achievement', name: 'Achievement', color: '#CA8A04', episodes: 10 },
-    { id: 'triumph', name: 'Triumph', color: '#B91C1C', episodes: 7 },
-    { id: 'empowerment', name: 'Empowerment', color: '#9333EA', episodes: 9 },
-    { id: 'leadership', name: 'Leadership', color: '#1D4ED8', episodes: 12 },
-    { id: 'creativity', name: 'Creativity', color: '#DB2777', episodes: 8 },
-    { id: 'innovation', name: 'Innovation', color: '#0891B2', episodes: 10 },
-    { id: 'excellence', name: 'Excellence', color: '#7E22CE', episodes: 9 },
+    { id: 'hope', name: 'Hope', color: '#10B981', episodes: 8, icon: Heart },
+    { id: 'courage', name: 'Courage', color: '#EF4444', episodes: 10, icon: Shield },
+    { id: 'confidence', name: 'Confidence', color: '#F59E0B', episodes: 9, icon: Zap },
+    { id: 'success', name: 'Success', color: '#8B5CF6', episodes: 12, icon: Award },
+    { id: 'growth', name: 'Growth', color: '#22C55E', episodes: 11, icon: Sprout },
+    { id: 'resilience', name: 'Resilience', color: '#3B82F6', episodes: 8, icon: Mountain },
+    { id: 'determination', name: 'Determination', color: '#DC2626', episodes: 9, icon: Target },
+    { id: 'passion', name: 'Passion', color: '#EC4899', episodes: 7, icon: Flame },
+    { id: 'gratitude', name: 'Gratitude', color: '#F97316', episodes: 10, icon: Gift },
+    { id: 'optimism', name: 'Optimism', color: '#FBBF24', episodes: 8, icon: Sun },
+    { id: 'focus', name: 'Focus', color: '#6366F1', episodes: 9, icon: Focus },
+    { id: 'discipline', name: 'Discipline', color: '#64748B', episodes: 11, icon: BookOpen },
+    { id: 'mindfulness', name: 'Mindfulness', color: '#14B8A6', episodes: 10, icon: Brain },
+    { id: 'vision', name: 'Vision', color: '#A855F7', episodes: 7, icon: Eye },
+    { id: 'purpose', name: 'Purpose', color: '#0EA5E9', episodes: 9, icon: Compass },
+    { id: 'balance', name: 'Balance', color: '#84CC16', episodes: 8, icon: Scale },
+    { id: 'clarity', name: 'Clarity', color: '#06B6D4', episodes: 7, icon: Lightbulb },
+    { id: 'drive', name: 'Drive', color: '#E11D48', episodes: 10, icon: Rocket },
+    { id: 'ambition', name: 'Ambition', color: '#7C3AED', episodes: 9, icon: Star },
+    { id: 'persistence', name: 'Persistence', color: '#059669', episodes: 8, icon: TrendingUp },
+    { id: 'momentum', name: 'Momentum', color: '#2563EB', episodes: 7, icon: Zap },
+    { id: 'progress', name: 'Progress', color: '#16A34A', episodes: 11, icon: TrendingUp },
+    { id: 'breakthrough', name: 'Breakthrough', color: '#D946EF', episodes: 6, icon: Sparkles },
+    { id: 'achievement', name: 'Achievement', color: '#CA8A04', episodes: 10, icon: Award },
+    { id: 'triumph', name: 'Triumph', color: '#B91C1C', episodes: 7, icon: Award },
+    { id: 'empowerment', name: 'Empowerment', color: '#9333EA', episodes: 9, icon: Zap },
+    { id: 'leadership', name: 'Leadership', color: '#1D4ED8', episodes: 12, icon: Users },
+    { id: 'creativity', name: 'Creativity', color: '#DB2777', episodes: 8, icon: Sparkles },
+    { id: 'innovation', name: 'Innovation', color: '#0891B2', episodes: 10, icon: Lightbulb },
+    { id: 'excellence', name: 'Excellence', color: '#7E22CE', episodes: 9, icon: Star },
 ];
 
 const QUICK_TOPICS = ['AI trends', 'Morning motivation', 'Sleep story', 'Health tips', 'World news', 'Book summary'];
@@ -914,7 +916,7 @@ export default function SearchPods() {
                                         className="w-12 h-12 rounded-xl flex items-center justify-center"
                                         style={{ backgroundColor: `${cat.color}20` }}
                                     >
-                                        <Radio className="w-6 h-6" style={{ color: cat.color }} />
+                                        <cat.icon className="w-6 h-6" style={{ color: cat.color }} />
                                     </div>
                                     <div>
                                         <h3 className="text-gray-900 font-bold">{cat.name}</h3>
@@ -990,6 +992,48 @@ export default function SearchPods() {
                             )}
                         </div>
                     ))}
+                </div>
+
+                {/* Trending Section */}
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <Radio className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                            <span className="text-gray-900 font-bold text-2xl md:text-3xl">Trending Now</span>
+                            <p className="text-xs text-gray-500">Most popular podcasts</p>
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {trending.map((item, i) => (
+                            <div
+                                key={i}
+                                onClick={() => playEpisode(item)}
+                                className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
+                            >
+                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                    {i + 1}
+                                </div>
+                                <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                        <Play className="w-4 h-4 text-white" fill="white" />
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
+                                    <p className="text-gray-500 text-xs capitalize">{item.category}</p>
+                                    <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
+                                        <Users className="w-3 h-3" />
+                                        {item.plays.toLocaleString()} plays
+                                    </div>
+                                </div>
+                                <AnimatedBars isPlaying={true} color="#7c3aed" />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </main>
 
