@@ -297,20 +297,63 @@ export default function SearchPods() {
         setCurrentCaption('Generating audio...');
         setCaptionWords([]);
 
-        // Generate image in parallel
+        // Generate image with logo watermark
         base44.integrations.Core.GenerateImage({
             prompt: `Beautiful lifestyle photography representing "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style, professional DSLR quality. No technology devices, no phones, no computers, no headphones, no microphones, no screens. Absolutely no text, no words, no letters, no titles, no captions, no watermarks, no logos, no URLs.`
-        }).then(result => {
-            setPodImage(result.url);
-            setImageLoading(false);
+        }).then(async result => {
+            // Create canvas to add watermark
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Draw image
+                ctx.drawImage(img, 0, 0);
+
+                // Add semi-transparent logo watermark
+                const logo = new Image();
+                logo.crossOrigin = 'anonymous';
+                logo.onload = () => {
+                    ctx.globalAlpha = 0.15;
+                    const logoSize = Math.min(canvas.width, canvas.height) * 0.3;
+                    const x = (canvas.width - logoSize) / 2;
+                    const y = (canvas.height - logoSize) / 2;
+                    ctx.drawImage(logo, x, y, logoSize, logoSize);
+
+                    setPodImage(canvas.toDataURL('image/jpeg', 0.9));
+                    setImageLoading(false);
+                };
+                logo.onerror = () => {
+                    setPodImage(result.url);
+                    setImageLoading(false);
+                };
+                logo.src = LOGO_URL;
+            };
+            img.onerror = () => {
+                setPodImage(result.url);
+                setImageLoading(false);
+            };
+            img.src = result.url;
         }).catch(err => {
             console.error('Image generation error:', err);
             setImageLoading(false);
         });
 
         try {
+            // Simulate progressive loading
+            const progressInterval = setInterval(() => {
+                setGenerationProgress(prev => {
+                    if (prev < 20) return prev + 2;
+                    if (prev < 40) return prev + 1;
+                    return prev;
+                });
+            }, 200);
+
             setGenerationStep('Writing script...');
-            setGenerationProgress(25);
+            setGenerationProgress(10);
 
             // Generate longer script using LLM for 8 minute podcast
             let rawText;
@@ -348,8 +391,9 @@ export default function SearchPods() {
             As we wrap up, remember that learning is a continuous journey. Thank you for listening, and I hope you found this helpful. Until next time!`;
             }
             
+            clearInterval(progressInterval);
             setGenerationStep('Generating audio...');
-            setGenerationProgress(50);
+            setGenerationProgress(45);
             const cleanText = cleanTextForSpeech(rawText);
 
             // Split into sentences for captions
@@ -378,7 +422,7 @@ export default function SearchPods() {
                 throw new Error(ttsError?.response?.data?.error || ttsError?.message || 'Audio generation failed');
             }
 
-            setGenerationProgress(75);
+            setGenerationProgress(70);
 
             // Check if we need to use Web Speech API fallback
             if (ttsResponse?.data?.useWebSpeech) {
@@ -429,7 +473,7 @@ export default function SearchPods() {
             
             console.log('Audio received, length:', ttsResponse.data.audio.length);
 
-            setGenerationProgress(90);
+            setGenerationProgress(85);
 
             // Convert base64 to audio blob
             const binaryString = atob(ttsResponse.data.audio);
@@ -448,6 +492,8 @@ export default function SearchPods() {
             // Set up audio events
             audio.onloadedmetadata = () => {
                 setDuration(audio.duration);
+                // Preload recommendations once audio is loaded
+                loadRecommendations();
             };
 
             audio.ontimeupdate = () => {
@@ -487,6 +533,7 @@ export default function SearchPods() {
             });
 
         } catch (error) {
+            clearInterval(progressInterval);
             console.error('Generation error:', error);
             setGenerationError({ 
                 code: 'E300', 
@@ -596,9 +643,8 @@ export default function SearchPods() {
 
     // Load recommendations based on current episode
     const loadRecommendations = async () => {
-        if (!currentEpisode) return;
-        setShowRecommendations(true);
-        
+        if (!currentEpisode || recommendations.length > 0) return;
+
         try {
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `Based on someone listening to "${currentEpisode.title}" in the ${currentEpisode.category} category, suggest 5 related podcast topics they might enjoy. Make them diverse but related.`,
@@ -855,11 +901,12 @@ export default function SearchPods() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-8">
+        <div className="min-h-screen bg-white pb-8">
             {/* Logo Header */}
             <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center">
-                    <img src={LOGO_URL} alt="SearchPods" className="h-10 object-contain" />
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center gap-3">
+                    <img src={LOGO_URL} alt="SearchPods" className="h-7 object-contain" />
+                    <span className="text-2xl font-bold text-gray-900">SearchPods</span>
                 </div>
             </div>
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
