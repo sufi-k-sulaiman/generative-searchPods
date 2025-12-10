@@ -490,7 +490,8 @@ export default function SearchPods() {
             try {
                 ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                     text: cleanText,
-                    lang: 'en-gb'
+                    lang: 'en-gb',
+                    voiceId: selectedVoice
                 });
                 console.log('TTS response received:', ttsResponse?.data ? 'has data' : 'no data', ttsResponse?.data?.error || 'no error');
             } catch (ttsError) {
@@ -805,7 +806,8 @@ export default function SearchPods() {
             // Generate new audio with new voice using ElevenLabs
             const ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                 text: remainingText,
-                lang: 'en-gb'
+                lang: 'en-gb',
+                voiceId: newVoice
             });
             
             if (ttsResponse.data?.audio) {
@@ -905,7 +907,8 @@ export default function SearchPods() {
             // Generate new audio for extended content using ElevenLabs
             const ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                 text: cleanText,
-                lang: 'en-gb'
+                lang: 'en-gb',
+                voiceId: selectedVoice
             });
 
             if (ttsResponse.data?.audio) {
