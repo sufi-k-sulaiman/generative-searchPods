@@ -244,15 +244,14 @@ export default function SearchPods() {
         try {
             const currentSubtopics = categoryData[categoryId].subtopics || [];
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 6 more unique and creative subtopics for the "${categoryId}" category. Avoid these existing ones: ${currentSubtopics.join(', ')}. Return only new topics.`,
+                prompt: `Generate 6 new unique subtopics for the "${categoryId}" category. Current subtopics to avoid: ${currentSubtopics.join(', ')}`,
+                add_context_from_internet: false,
                 response_json_schema: {
                     type: "object",
                     properties: {
                         subtopics: { 
                             type: "array", 
-                            items: { type: "string" },
-                            minItems: 6,
-                            maxItems: 6
+                            items: { type: "string" }
                         }
                     }
                 }
@@ -260,13 +259,15 @@ export default function SearchPods() {
             
             const newSubtopics = response?.subtopics || [];
             
-            setCategoryData(prev => ({
-                ...prev,
-                [categoryId]: {
-                    ...prev[categoryId],
-                    subtopics: [...currentSubtopics, ...newSubtopics]
-                }
-            }));
+            if (newSubtopics.length > 0) {
+                setCategoryData(prev => ({
+                    ...prev,
+                    [categoryId]: {
+                        ...prev[categoryId],
+                        subtopics: [...currentSubtopics, ...newSubtopics]
+                    }
+                }));
+            }
         } catch (error) {
             console.error('Error loading more subtopics:', error);
         } finally {
