@@ -151,7 +151,7 @@ export default function SearchPods() {
     const [currentCaption, setCurrentCaption] = useState('');
     const [captionWords, setCaptionWords] = useState([]);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const [selectedVoice, setSelectedVoice] = useState('en-GB-Wavenet-A');
+    const [selectedVoice, setSelectedVoice] = useState('en-gb');
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [showEqualizer, setShowEqualizer] = useState(false);
@@ -242,12 +242,12 @@ export default function SearchPods() {
         return () => clearTimeout(debounce);
     }, [searchQuery]);
 
-    // Voice mappings - Google Cloud TTS voices
+    // Voice mappings - Google Translate TTS (free)
             const voiceOptions = [
-                { id: 'en-GB-Wavenet-A', label: 'Bella', lang: 'en-GB' },
-                { id: 'en-US-Wavenet-C', label: 'Rachel', lang: 'en-US' },
-                { id: 'en-US-Wavenet-F', label: 'Domi', lang: 'en-US' },
-                { id: 'en-GB-Wavenet-B', label: 'Elli', lang: 'en-GB' },
+                { id: 'en-gb', label: 'British', lang: 'en-GB' },
+                { id: 'en-us', label: 'American', lang: 'en-US' },
+                { id: 'en-au', label: 'Australian', lang: 'en-AU' },
+                { id: 'en-in', label: 'Indian', lang: 'en-IN' },
             ];
 
     // Cleanup audio on unmount
