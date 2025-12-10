@@ -1220,8 +1220,8 @@ export default function SearchPods() {
                             <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-56 md:h-56 rounded-3xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
                                 {/* Extended ribbon */}
                                 {extendedCount > 0 && (
-                                    <div className="absolute top-3 -right-8 bg-purple-600 text-white text-xs font-bold px-8 py-1 rotate-45 z-20 shadow-md flex items-center gap-1">
-                                        <Plus className="w-3 h-3" />
+                                    <div className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full z-20 shadow-lg flex items-center gap-1.5">
+                                        <img src={LOGO_URL} alt="" className="w-3.5 h-3.5 object-contain" />
                                         Extended
                                     </div>
                                 )}
@@ -1236,13 +1236,18 @@ export default function SearchPods() {
                                 
                                 {/* Image Loading Overlay */}
                                 {imageLoading && (
-                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/90 to-indigo-600/90 flex flex-col items-center justify-center gap-2">
-                                        <img 
-                                            src={LOGO_URL} 
-                                            alt="Loading" 
-                                            className="w-12 h-12 object-contain animate-spin" 
-                                            style={{ animationDuration: '2s' }}
-                                        />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/90 to-indigo-600/90 flex flex-col items-center justify-center gap-3">
+                                        <div className="relative">
+                                            <img 
+                                                src={LOGO_URL} 
+                                                alt="Loading" 
+                                                className="w-12 h-12 object-contain"
+                                            />
+                                            <div className="absolute inset-0 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+                                        </div>
+                                        <div className="w-32 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                                            <div className="h-full bg-white/80 rounded-full animate-pulse" style={{ width: '70%' }} />
+                                        </div>
                                         <span className="text-white/70 text-xs">Creating artwork...</span>
                                     </div>
                                 )}
