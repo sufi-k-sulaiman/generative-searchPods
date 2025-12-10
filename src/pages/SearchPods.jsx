@@ -130,6 +130,9 @@ export default function SearchPods() {
     const [categoryData, setCategoryData] = useState({});
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [loadingCategory, setLoadingCategory] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [trendingTopics, setTrendingTopics] = useState([]);
     
     // Player state
     const [showPlayer, setShowPlayer] = useState(false);
@@ -169,6 +172,60 @@ export default function SearchPods() {
         }, 30000);
         return () => clearInterval(interval);
     }, []);
+
+    // Load trending topics on mount
+    useEffect(() => {
+        const loadTrendingTopics = async () => {
+            try {
+                const response = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Generate 8 trending podcast topics that people are searching for right now. Include diverse topics from technology, health, business, personal development, and current events.`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            topics: {
+                                type: "array",
+                                items: { type: "string" }
+                            }
+                        }
+                    }
+                });
+                setTrendingTopics(response?.topics || []);
+            } catch (error) {
+                console.error('Error loading trending topics:', error);
+            }
+        };
+        loadTrendingTopics();
+    }, []);
+
+    // Type-ahead suggestions
+    useEffect(() => {
+        if (searchQuery.trim().length < 2) {
+            setSuggestions([]);
+            return;
+        }
+
+        const debounce = setTimeout(async () => {
+            try {
+                const response = await base44.integrations.Core.InvokeLLM({
+                    prompt: `User is searching for: "${searchQuery}". Suggest 5 related podcast topics they might be interested in. Be specific and relevant.`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            suggestions: {
+                                type: "array",
+                                items: { type: "string" }
+                            }
+                        }
+                    }
+                });
+                setSuggestions(response?.suggestions || []);
+            } catch (error) {
+                console.error('Error loading suggestions:', error);
+            }
+        }, 500);
+
+        return () => clearTimeout(debounce);
+    }, [searchQuery]);
 
     // ElevenLabs voice IDs
             const elevenLabsVoices = [
@@ -921,7 +978,12 @@ export default function SearchPods() {
                         <Input
                             type="text"
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setShowSuggestions(true);
+                            }}
+                            onFocus={() => setShowSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                             placeholder="Search or generate podcasts on any topic..."
                             className="w-full h-14 pl-6 pr-32 rounded-full border-gray-200 bg-white shadow-sm focus:border-purple-300 focus:ring-2 focus:ring-purple-100 text-lg"
                         />
@@ -933,24 +995,48 @@ export default function SearchPods() {
                             <Sparkles className="w-4 h-4" />
                             Generate
                         </button>
+
+                        {/* Type-ahead suggestions */}
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden z-50">
+                                {suggestions.map((suggestion, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => {
+                                            setSearchQuery(suggestion);
+                                            playEpisode({ title: suggestion, category: 'Search' });
+                                        }}
+                                        className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                    >
+                                        <Sparkles className="w-4 h-4 text-purple-600" />
+                                        <span className="text-gray-900">{suggestion}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </form>
-                    
-                    {/* Quick topic suggestions */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-gray-400 text-sm">Try:</span>
-                        {QUICK_TOPICS.map((topic) => (
-                            <button
-                                key={topic}
-                                onClick={() => {
-                                    setSearchQuery(topic);
-                                    playEpisode({ title: topic, category: 'Quick' });
-                                }}
-                                className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600 text-sm transition-all"
-                            >
-                                {topic}
-                            </button>
-                        ))}
-                    </div>
+
+                    {/* Trending search topics */}
+                    {trendingTopics.length > 0 && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-gray-400 text-sm flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" />
+                                Trending:
+                            </span>
+                            {trendingTopics.slice(0, 6).map((topic, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        setSearchQuery(topic);
+                                        playEpisode({ title: topic, category: 'Trending' });
+                                    }}
+                                    className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 hover:from-purple-200 hover:to-indigo-200 text-purple-700 text-sm transition-all font-medium"
+                                >
+                                    {topic}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Categories Grid */}
