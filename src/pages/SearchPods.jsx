@@ -146,7 +146,6 @@ export default function SearchPods() {
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [showEqualizer, setShowEqualizer] = useState(false);
-    const [showBraille, setShowBraille] = useState(false);
     const [isExtending, setIsExtending] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
     const [loadingMoreSubtopics, setLoadingMoreSubtopics] = useState(null);
@@ -1042,9 +1041,9 @@ export default function SearchPods() {
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-full md:max-w-lg p-0 bg-white border-gray-200 h-screen md:h-auto md:max-h-[90vh] overflow-y-auto [&>button]:hidden w-full md:w-auto rounded-none md:rounded-lg" aria-describedby={undefined}>
+                <DialogContent className="max-w-full md:max-w-lg p-0 bg-white border-gray-200 h-screen md:h-auto md:max-h-[90vh] overflow-y-auto [&>button]:hidden w-full md:w-auto rounded-none md:rounded-lg safe-area-inset" aria-describedby={undefined}>
                     <DialogTitle className="sr-only">Now Playing</DialogTitle>
-                    <div className="p-4 md:p-6 pb-safe">
+                    <div className="p-4 md:p-6 pb-safe min-h-screen md:min-h-0 flex flex-col">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-4 md:mb-6">
                             <span className="text-gray-500 text-xs md:text-sm uppercase tracking-wider">Now Playing</span>
@@ -1054,8 +1053,8 @@ export default function SearchPods() {
                         </div>
 
                         {/* Album Art */}
-                        <div className="flex justify-center mb-4 md:mb-6">
-                            <div className="relative w-64 h-64 md:w-56 md:h-56 rounded-2xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
+                        <div className="flex justify-center mb-4 md:mb-6 flex-shrink-0">
+                            <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-56 md:h-56 rounded-3xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
                                 {/* Extended ribbon */}
                                 {extendedCount > 0 && (
                                     <div className="absolute top-3 -right-8 bg-green-500 text-white text-xs font-bold px-8 py-1 rotate-45 z-20 shadow-md">
@@ -1118,45 +1117,39 @@ export default function SearchPods() {
                         </div>
 
                         {/* Title */}
-                        <div className="text-center mb-3 md:mb-4 px-2">
-                            <h2 className="text-gray-900 text-xl md:text-xl font-bold mb-1 line-clamp-2">{currentEpisode?.title}</h2>
-                            <p className="text-purple-600 text-base md:text-sm">{currentEpisode?.category}</p>
+                        <div className="text-center mb-3 md:mb-4 px-2 flex-shrink-0">
+                            <h2 className="text-gray-900 text-2xl md:text-xl font-bold mb-2 line-clamp-2">{currentEpisode?.title}</h2>
+                            <p className="text-purple-600 text-lg md:text-sm font-medium">{currentEpisode?.category}</p>
                         </div>
 
                         {/* Captions - fixed height for 3 lines */}
                         {!isGenerating && (
                             <div className="mb-4 md:mb-6">
                                 <div className="bg-gray-50 rounded-xl p-3 md:p-4 min-h-[84px] md:h-[84px] border border-gray-200 flex items-center justify-center overflow-hidden">
-                                    {showBraille ? (
-                                        <p className="text-center leading-relaxed text-lg font-mono text-gray-700 line-clamp-3">
-                                            {toBraille(currentCaption)}
-                                        </p>
-                                    ) : (
-                                        <p className="text-center leading-relaxed text-sm text-gray-700 line-clamp-3">
-                                                    {captionWords.map((word, i) => {
-                                                        // Calculate word highlight based on time within current sentence
-                                                        const sentenceIndex = Math.max(0, sentencesRef.current.findIndex(s => s === currentCaption));
-                                                        const sentenceCount = sentencesRef.current.length || 1;
+                                    <p className="text-center leading-relaxed text-sm md:text-base text-gray-700 line-clamp-3">
+                                        {captionWords.map((word, i) => {
+                                            // Calculate word highlight based on time within current sentence
+                                            const sentenceIndex = Math.max(0, sentencesRef.current.findIndex(s => s === currentCaption));
+                                            const sentenceCount = sentencesRef.current.length || 1;
 
-                                                        // Each sentence gets equal time slice
-                                                        const timePerSentence = duration / sentenceCount;
-                                                        const sentenceStartTime = sentenceIndex * timePerSentence;
-                                                        const timeIntoSentence = currentTime - sentenceStartTime;
-                                                        const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
+                                            // Each sentence gets equal time slice
+                                            const timePerSentence = duration / sentenceCount;
+                                            const sentenceStartTime = sentenceIndex * timePerSentence;
+                                            const timeIntoSentence = currentTime - sentenceStartTime;
+                                            const sentenceProgress = Math.max(0, Math.min(1, timeIntoSentence / timePerSentence));
 
-                                                        // Highlight word based on progress through sentence
-                                                        const wordCount = captionWords.length || 1;
-                                                        const highlightIndex = Math.floor(sentenceProgress * wordCount);
-                                                        const isHighlighted = i === highlightIndex || i === highlightIndex - 1;
+                                            // Highlight word based on progress through sentence
+                                            const wordCount = captionWords.length || 1;
+                                            const highlightIndex = Math.floor(sentenceProgress * wordCount);
+                                            const isHighlighted = i === highlightIndex || i === highlightIndex - 1;
 
-                                                        return (
-                                                            <span key={i} className={isHighlighted ? 'text-purple-600 font-semibold' : ''}>
-                                                                {word}{' '}
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </p>
-                                    )}
+                                            return (
+                                                <span key={i} className={isHighlighted ? 'text-purple-600 font-semibold' : ''}>
+                                                    {word}{' '}
+                                                </span>
+                                            );
+                                        })}
+                                    </p>
                                 </div>
                                 {/* Tell me more button */}
                                 <button
@@ -1206,34 +1199,34 @@ export default function SearchPods() {
                         </div>
 
                         {/* Controls */}
-                        <div className="flex items-center justify-center gap-6 md:gap-4 py-2">
+                        <div className="flex items-center justify-center gap-8 sm:gap-10 md:gap-6 py-4 md:py-2 flex-shrink-0">
                             <button 
                                 onClick={skipBackward}
                                 disabled={isGenerating}
-                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
+                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
                             >
-                                <RotateCcw className="w-7 h-7 md:w-6 md:h-6" />
-                                <span className="text-xs mt-0.5">15s</span>
+                                <RotateCcw className="w-8 h-8 md:w-6 md:h-6" />
+                                <span className="text-sm md:text-xs mt-1 font-medium">15s</span>
                             </button>
                             <button
                                 onClick={togglePlay}
                                 disabled={isGenerating}
-                                className="w-20 h-20 md:w-16 md:h-16 rounded-full bg-purple-600 hover:bg-purple-700 active:scale-95 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-lg shadow-purple-500/30 touch-manipulation"
+                                className="w-24 h-24 sm:w-28 sm:h-28 md:w-16 md:h-16 rounded-full bg-purple-600 hover:bg-purple-700 active:scale-95 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-xl shadow-purple-500/40 touch-manipulation"
                             >
                                 {isPlaying ? (
-                                    <Pause className="w-9 h-9 md:w-7 md:h-7" />
+                                    <Pause className="w-10 h-10 sm:w-12 sm:h-12 md:w-7 md:h-7" />
                                 ) : (
-                                    <Play className="w-9 h-9 md:w-7 md:h-7 ml-1" fill="currentColor" />
+                                    <Play className="w-10 h-10 sm:w-12 sm:h-12 md:w-7 md:h-7 ml-1" fill="currentColor" />
                                 )}
                             </button>
 
                             <button 
                                 onClick={skipForward}
                                 disabled={isGenerating}
-                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
+                                className="text-gray-400 hover:text-gray-600 active:scale-95 p-3 md:p-2 flex flex-col items-center disabled:opacity-50 transition-transform touch-manipulation"
                             >
-                                <RotateCw className="w-7 h-7 md:w-6 md:h-6" />
-                                <span className="text-xs mt-0.5">30s</span>
+                                <RotateCw className="w-8 h-8 md:w-6 md:h-6" />
+                                <span className="text-sm md:text-xs mt-1 font-medium">30s</span>
                             </button>
                         </div>
 
@@ -1299,52 +1292,42 @@ export default function SearchPods() {
                         ))}
                         </div>
 
-                        {/* Options Row */}
-                        <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap pb-2">
-                            <button 
-                                onClick={() => setShowBraille(!showBraille)}
-                                className={`flex items-center gap-2 px-4 py-2.5 md:px-3 md:py-1.5 rounded-xl md:rounded-lg text-base md:text-sm transition-all active:scale-95 touch-manipulation ${
-                                    showBraille 
-                                        ? 'bg-purple-100 text-purple-600 border border-purple-200 shadow-sm' 
-                                        : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600'
-                                }`}
-                            >
-                                <Eye className="w-5 h-5 md:w-4 md:h-4" />
-                                <span className="hidden sm:inline">Braille</span>
-                            </button>
+                        {/* Recommendations Button - More Prominent */}
+                        <div className="mt-3 md:mt-4 pb-2">
                             <button 
                                 onClick={loadRecommendations}
                                 disabled={isGenerating}
-                                className={`flex items-center gap-2 px-4 py-2.5 md:px-3 md:py-1.5 rounded-xl md:rounded-lg text-base md:text-sm transition-all active:scale-95 touch-manipulation ${
+                                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium transition-all active:scale-[0.98] touch-manipulation shadow-sm ${
                                     showRecommendations 
-                                        ? 'bg-purple-100 text-purple-600 border border-purple-200 shadow-sm' 
-                                        : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600'
+                                        ? 'bg-purple-600 text-white border border-purple-700' 
+                                        : 'bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border border-purple-200 text-purple-700'
                                 } disabled:opacity-50`}
                             >
-                                <ListMusic className="w-5 h-5 md:w-4 md:h-4" />
-                                <span className="hidden sm:inline">Recommended</span>
+                                <ListMusic className="w-5 h-5" />
+                                <span>Recommended For You</span>
                             </button>
                         </div>
                     </div>
 
-                    {/* Recommendations Drawer */}
+                    {/* Recommendations Drawer - Scrollable */}
                     {showRecommendations && (
-                        <div className="border-t border-gray-200 bg-gray-50 p-4 max-h-64 overflow-y-auto">
-                            <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-semibold text-gray-700">Recommended For You</h4>
+                        <div className="border-t border-gray-200 bg-gray-50 p-4 max-h-80 overflow-y-auto overscroll-contain">
+                            <div className="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 pb-2 z-10">
+                                <h4 className="text-base font-bold text-gray-900">Recommended For You</h4>
                                 <button 
                                     onClick={() => setShowRecommendations(false)}
-                                    className="text-gray-400 hover:text-gray-600"
+                                    className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors touch-manipulation"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-4 h-4 text-gray-600" />
                                 </button>
                             </div>
                             {recommendations.length === 0 ? (
-                                <div className="flex items-center justify-center py-4">
-                                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin" />
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    <Loader2 className="w-6 h-6 text-purple-600 animate-spin mb-2" />
+                                    <p className="text-sm text-gray-500">Finding perfect matches...</p>
                                 </div>
                             ) : (
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {recommendations.map((rec, i) => (
                                         <button
                                             key={i}
@@ -1352,16 +1335,16 @@ export default function SearchPods() {
                                                 setShowRecommendations(false);
                                                 playEpisode({ title: rec.title, category: rec.category });
                                             }}
-                                            className="w-full flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 transition-all text-left"
+                                            className="w-full flex items-center gap-3 p-4 rounded-xl bg-white hover:bg-purple-50 active:bg-purple-100 border border-gray-200 hover:border-purple-300 transition-all text-left shadow-sm hover:shadow-md touch-manipulation"
                                         >
-                                            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                                <Radio className="w-5 h-5 text-purple-600" />
+                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                                <Radio className="w-6 h-6 text-white" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-800 truncate">{rec.title}</p>
+                                                <p className="text-sm font-semibold text-gray-900 mb-1">{rec.title}</p>
                                                 <p className="text-xs text-gray-500">{rec.reason || rec.category}</p>
                                             </div>
-                                            <Play className="w-4 h-4 text-purple-600" />
+                                            <Play className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" />
                                         </button>
                                     ))}
                                 </div>
