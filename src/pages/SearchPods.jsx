@@ -986,7 +986,7 @@ export default function SearchPods() {
                             }}
                             onFocus={() => setShowSuggestions(true)}
                             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                            placeholder="Search or generate podcasts on any topic..."
+                            placeholder="Search any topic"
                             className="w-full h-14 pl-6 pr-32 rounded-full border-gray-200 bg-white shadow-sm focus:border-purple-300 focus:ring-2 focus:ring-purple-100 text-lg"
                         />
                         <button
