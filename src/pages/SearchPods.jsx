@@ -1006,7 +1006,7 @@ export default function SearchPods() {
                                         key={i}
                                         onClick={() => {
                                             setSearchQuery(suggestion);
-                                            playEpisode({ title: suggestion, category: 'Search' });
+                                            setShowSuggestions(false);
                                         }}
                                         className="w-full px-6 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
                                     >
@@ -1018,8 +1018,8 @@ export default function SearchPods() {
                         )}
                     </form>
 
-                    {/* Trending search topics */}
-                    {trendingTopics.length > 0 && (
+                    {/* Trending search topics - shown when typing */}
+                    {searchQuery.trim() && trendingTopics.length > 0 && (
                         <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-gray-400 text-sm flex items-center gap-1">
                                 <TrendingUp className="w-3 h-3" />
@@ -1030,7 +1030,6 @@ export default function SearchPods() {
                                     key={i}
                                     onClick={() => {
                                         setSearchQuery(topic);
-                                        playEpisode({ title: topic, category: 'Trending' });
                                     }}
                                     className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 hover:from-purple-200 hover:to-indigo-200 text-purple-700 text-sm transition-all font-medium"
                                 >
