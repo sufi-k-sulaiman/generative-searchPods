@@ -707,7 +707,7 @@ export default function SearchPods() {
     };
 
     // Load recommendations based on current episode
-    const loadRecommendations = useCallback(async () => {
+    const loadRecommendations = async () => {
         if (!currentEpisode) return;
         if (recommendations.length > 0) return;
 
@@ -739,7 +739,7 @@ export default function SearchPods() {
                 { title: 'Trending Now', category: 'Popular', reason: 'What others are listening to' }
             ]);
         }
-    }, [currentEpisode, recommendations.length]);
+    };
 
     const [extendedCount, setExtendedCount] = useState(0);
     const [isSwappingVoice, setIsSwappingVoice] = useState(false);
@@ -1220,8 +1220,9 @@ export default function SearchPods() {
                             <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-56 md:h-56 rounded-3xl md:rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
                                 {/* Extended ribbon */}
                                 {extendedCount > 0 && (
-                                    <div className="absolute top-3 -right-8 bg-green-500 text-white text-xs font-bold px-8 py-1 rotate-45 z-20 shadow-md">
-                                        +{extendedCount} Extended
+                                    <div className="absolute top-3 -right-8 bg-purple-600 text-white text-xs font-bold px-8 py-1 rotate-45 z-20 shadow-md flex items-center gap-1">
+                                        <Plus className="w-3 h-3" />
+                                        Extended
                                     </div>
                                 )}
                                 {/* Generated Image Background */}
