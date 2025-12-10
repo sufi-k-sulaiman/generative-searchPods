@@ -169,27 +169,31 @@ Deno.serve(async (req) => {
         let usedService = '';
         const errors = [];
         
-        // Try Google Translate TTS first
-        try {
-            console.log('Trying Google Translate TTS...');
-            audioBytes = await googleTranslateTTS(text, lang.split('-')[0]);
-            usedService = 'google';
-            console.log('Google Translate TTS succeeded');
-        } catch (googleError) {
-            console.log('Google Translate TTS failed:', googleError.message);
-            errors.push(`Google: ${googleError.message}`);
-            
-            // Try ElevenLabs second
+        // Try ElevenLabs first if voice_id is provided
+        if (voice_id) {
             try {
-                console.log('Trying ElevenLabs TTS...');
+                console.log('Trying ElevenLabs TTS with voice:', voice_id);
                 audioBytes = await elevenLabsTTS(text, voice_id);
                 usedService = 'elevenlabs';
                 console.log('ElevenLabs TTS succeeded');
             } catch (elevenError) {
                 console.log('ElevenLabs TTS failed:', elevenError.message);
                 errors.push(`ElevenLabs: ${elevenError.message}`);
+            }
+        }
+        
+        // If ElevenLabs failed or no voice_id, try Google Translate TTS
+        if (!audioBytes) {
+            try {
+                console.log('Trying Google Translate TTS...');
+                audioBytes = await googleTranslateTTS(text, lang.split('-')[0]);
+                usedService = 'google';
+                console.log('Google Translate TTS succeeded');
+            } catch (googleError) {
+                console.log('Google Translate TTS failed:', googleError.message);
+                errors.push(`Google: ${googleError.message}`);
                 
-                // Try EdgeTTS third
+                // Try EdgeTTS
                 try {
                     console.log('Trying EdgeTTS...');
                     audioBytes = await edgeTTS(text, lang);

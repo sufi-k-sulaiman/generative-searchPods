@@ -491,7 +491,7 @@ export default function SearchPods() {
                 ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                     text: cleanText,
                     lang: 'en-gb',
-                    voiceId: selectedVoice
+                    voice_id: selectedVoice
                 });
                 console.log('TTS response received:', ttsResponse?.data ? 'has data' : 'no data', ttsResponse?.data?.error || 'no error');
             } catch (ttsError) {
@@ -807,7 +807,7 @@ export default function SearchPods() {
             const ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                 text: remainingText,
                 lang: 'en-gb',
-                voiceId: newVoice
+                voice_id: newVoice
             });
             
             if (ttsResponse.data?.audio) {
@@ -908,7 +908,7 @@ export default function SearchPods() {
             const ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                 text: cleanText,
                 lang: 'en-gb',
-                voiceId: selectedVoice
+                voice_id: selectedVoice
             });
 
             if (ttsResponse.data?.audio) {
