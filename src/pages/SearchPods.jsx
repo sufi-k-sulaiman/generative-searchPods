@@ -518,11 +518,17 @@ export default function SearchPods() {
 
                 // Find and set the selected voice
                 const voiceConfig = voiceOptions.find(v => v.id === selectedVoice);
-                const selectedVoiceObj = voices.find(v => v.name === voiceConfig?.id);
-                if (selectedVoiceObj) {
-                    utterance.voice = selectedVoiceObj;
+                if (voiceConfig) {
+                    const selectedVoiceObj = voices.find(v => v.name === voiceConfig.id);
+                    if (selectedVoiceObj) {
+                        utterance.voice = selectedVoiceObj;
+                        utterance.lang = selectedVoiceObj.lang;
+                    } else {
+                        utterance.lang = voiceConfig.lang;
+                    }
+                } else {
+                    utterance.lang = 'en-GB';
                 }
-                utterance.lang = voiceConfig?.lang || 'en-GB';
                 utterance.rate = 1;
                 
                 let wordIndex = 0;
@@ -537,24 +543,30 @@ export default function SearchPods() {
                 };
                 
                 utterance.onend = () => setIsPlaying(false);
-                
+
                 setGenerationProgress(100);
                 setIsGenerating(false);
                 setCurrentCaption(sentences[0] || 'Ready to play');
                 setCaptionWords((sentences[0] || '').split(/\s+/).map(word => ({ word, highlight: false })));
                 setDuration(cleanText.length / 15);
-                
-                audioRef.current = {
-                    play: () => { speechSynthesis.speak(utterance); setIsPlaying(true); },
+
+                const mockAudio = {
+                    play: () => { 
+                        speechSynthesis.cancel(); // Cancel any existing speech
+                        speechSynthesis.speak(utterance); 
+                        setIsPlaying(true); 
+                        return Promise.resolve();
+                    },
                     pause: () => { speechSynthesis.pause(); setIsPlaying(false); },
-                    resume: () => { speechSynthesis.resume(); setIsPlaying(true); },
                     currentTime: 0,
                     duration: cleanText.length / 15,
-                    volume: 1,
-                    playbackRate: 1,
+                    volume: volume / 100,
+                    playbackRate: playbackSpeed,
                     isWebSpeech: true
                 };
-                
+
+                audioRef.current = mockAudio;
+
                 speechSynthesis.speak(utterance);
                 setIsPlaying(true);
                 return;
