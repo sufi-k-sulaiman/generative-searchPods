@@ -169,8 +169,8 @@ Deno.serve(async (req) => {
         let usedService = '';
         const errors = [];
 
-        // Determine language code from voice_id
-        const langCode = voice_id ? voice_id.split('-')[0] : lang.split('-')[0];
+        // Use full voice_id for accent variations (en-gb, en-us, en-au, en-in)
+        const langCode = voice_id || lang;
 
         // Try Google Translate TTS first (free)
         try {
