@@ -643,11 +643,13 @@ export default function SearchPods() {
             setCaptionWords((sentences[0] || '').split(/\s+/));
 
             // Auto-start playback
-            audio.play().then(() => {
-                setIsPlaying(true);
-            }).catch(err => {
-                console.log('Autoplay blocked, user can click play');
-            });
+            if (audio && audio.play) {
+                audio.play().then(() => {
+                    setIsPlaying(true);
+                }).catch(err => {
+                    console.log('Autoplay blocked, user can click play');
+                });
+            }
 
         } catch (error) {
             clearInterval(progressInterval);
