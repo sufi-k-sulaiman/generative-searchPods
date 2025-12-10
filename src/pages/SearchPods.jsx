@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
+import { LOGO_URL } from '@/components/NavigationConfig';
 
 const CATEGORIES = [
     { id: 'hope', name: 'Hope', color: '#10B981', episodes: 8, icon: Heart },
@@ -855,6 +856,12 @@ export default function SearchPods() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-8">
+            {/* Logo Header */}
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center">
+                    <img src={LOGO_URL} alt="SearchPods" className="h-10 object-contain" />
+                </div>
+            </div>
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
 
                 {/* Search & Generate */}
@@ -1304,53 +1311,46 @@ export default function SearchPods() {
                                 } disabled:opacity-50`}
                             >
                                 <ListMusic className="w-5 h-5" />
-                                <span>Recommended For You</span>
+                                <span>Recommended</span>
                             </button>
-                        </div>
-                    </div>
 
-                    {/* Recommendations Drawer - Scrollable */}
-                    {showRecommendations && (
-                        <div className="border-t border-gray-200 bg-gray-50 p-4 max-h-80 overflow-y-auto overscroll-contain">
-                            <div className="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 pb-2 z-10">
-                                <h4 className="text-base font-bold text-gray-900">Recommended For You</h4>
-                                <button 
-                                    onClick={() => setShowRecommendations(false)}
-                                    className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors touch-manipulation"
-                                >
-                                    <X className="w-4 h-4 text-gray-600" />
-                                </button>
-                            </div>
-                            {recommendations.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-8">
-                                    <Loader2 className="w-6 h-6 text-purple-600 animate-spin mb-2" />
-                                    <p className="text-sm text-gray-500">Finding perfect matches...</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {recommendations.map((rec, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => {
-                                                setShowRecommendations(false);
-                                                playEpisode({ title: rec.title, category: rec.category });
-                                            }}
-                                            className="w-full flex items-center gap-3 p-4 rounded-xl bg-white hover:bg-purple-50 active:bg-purple-100 border border-gray-200 hover:border-purple-300 transition-all text-left shadow-sm hover:shadow-md touch-manipulation"
-                                        >
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                                <Radio className="w-6 h-6 text-white" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-semibold text-gray-900 mb-1">{rec.title}</p>
-                                                <p className="text-xs text-gray-500">{rec.reason || rec.category}</p>
-                                            </div>
-                                            <Play className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" />
-                                        </button>
-                                    ))}
+                            {/* Recommendations List - Below Button */}
+                            {showRecommendations && (
+                                <div className="mt-3 max-h-96 overflow-y-auto overscroll-contain">
+                                    {recommendations.length === 0 ? (
+                                        <div className="flex flex-col items-center justify-center py-8">
+                                            <Loader2 className="w-6 h-6 text-purple-600 animate-spin mb-2" />
+                                            <p className="text-sm text-gray-500">Finding perfect matches...</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {recommendations.map((rec, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setShowRecommendations(false);
+                                                        playEpisode({ title: rec.title, category: rec.category });
+                                                    }}
+                                                    className="w-full flex items-center gap-3 p-4 rounded-xl bg-white hover:bg-purple-50 active:bg-purple-100 border border-gray-200 hover:border-purple-300 transition-all text-left shadow-sm hover:shadow-md touch-manipulation"
+                                                >
+                                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                                        <Radio className="w-6 h-6 text-white" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-gray-900 mb-1">{rec.title}</p>
+                                                        <p className="text-xs text-gray-500">{rec.reason || rec.category}</p>
+                                                    </div>
+                                                    <Play className="w-5 h-5 text-purple-600 flex-shrink-0" fill="currentColor" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
-                    )}
+                    </div>
+
+
                 </DialogContent>
             </Dialog>
         </div>

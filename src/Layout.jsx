@@ -78,8 +78,10 @@ export default function Layout({ children, currentPageName }) {
     document.documentElement.setAttribute('data-cognitive', savedCognitiveMode);
   }, []);
 
-  return (
-    <PageLayout activePage={currentPageName}>
+  const hideLayoutForSearchPods = currentPageName === 'SearchPods';
+
+  if (hideLayoutForSearchPods) {
+    return (
       <ErrorBoundary fallbackMessage="There was an error loading this page.">
       <style>{`
         /* Hide Leaflet attribution */
@@ -125,8 +127,61 @@ export default function Layout({ children, currentPageName }) {
           display: none !important;
         }
         `}</style>
-      {children}
-      </ErrorBoundary>
-    </PageLayout>
-  );
+          {children}
+        </ErrorBoundary>
+        );
+        }
+
+        return (
+        <PageLayout activePage={currentPageName}>
+        <ErrorBoundary fallbackMessage="There was an error loading this page.">
+        <style>{`
+          /* Hide Leaflet attribution */
+          .leaflet-control-attribution {
+            display: none !important;
+          }
+
+          /* Classic UI Style - links instead of buttons */
+          [data-ui-style="classic"] button:not([data-keep-button]) {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #7c3aed !important;
+            text-decoration: underline !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          [data-ui-style="classic"] button:hover:not([data-keep-button]) {
+            color: #5b21b6 !important;
+          }
+
+          /* Square UI Style */
+          [data-ui-style="square"] * {
+            border-radius: 0 !important;
+          }
+
+          /* Reader cognitive mode - minimal styling */
+          [data-cognitive="reader"] {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+          [data-cognitive="reader"] * {
+            background-image: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
+          [data-cognitive="reader"] .bg-gradient-to-br,
+          [data-cognitive="reader"] .bg-gradient-to-r {
+            background: #f9fafb !important;
+          }
+
+          /* Hide icons mode */
+          [data-hide-icons="true"] svg {
+            display: none !important;
+          }
+          `}</style>
+        {children}
+        </ErrorBoundary>
+        </PageLayout>
+        );
+        }
 }
