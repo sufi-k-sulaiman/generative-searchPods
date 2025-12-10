@@ -1236,7 +1236,12 @@ export default function SearchPods() {
                                 {/* Image Loading Overlay */}
                                 {imageLoading && (
                                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/90 to-indigo-600/90 flex flex-col items-center justify-center gap-2">
-                                        <Loader2 className="w-8 h-8 text-white/80 animate-spin" />
+                                        <img 
+                                            src={LOGO_URL} 
+                                            alt="Loading" 
+                                            className="w-12 h-12 object-contain animate-spin" 
+                                            style={{ animationDuration: '2s' }}
+                                        />
                                         <span className="text-white/70 text-xs">Creating artwork...</span>
                                     </div>
                                 )}
@@ -1458,7 +1463,12 @@ export default function SearchPods() {
                         {/* Recommendations Button - More Prominent */}
                         <div className="mt-3 md:mt-4 pb-2">
                             <button 
-                                onClick={() => setShowRecommendations(!showRecommendations)}
+                                onClick={() => {
+                                    setShowRecommendations(!showRecommendations);
+                                    if (!showRecommendations && recommendations.length === 0) {
+                                        loadRecommendations();
+                                    }
+                                }}
                                 disabled={isGenerating}
                                 className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium transition-all active:scale-[0.98] touch-manipulation shadow-sm ${
                                     showRecommendations 
