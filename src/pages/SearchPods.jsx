@@ -504,12 +504,21 @@ export default function SearchPods() {
             // Check if we need to use Web Speech API fallback
             if (ttsResponse?.data?.useWebSpeech) {
                 console.log('Using Web Speech API fallback');
+
+                // Wait for voices to load
+                let voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    await new Promise(resolve => {
+                        speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
+                    });
+                    voices = speechSynthesis.getVoices();
+                }
+
                 const utterance = new SpeechSynthesisUtterance(cleanText);
 
                 // Find and set the selected voice
-                const voices = speechSynthesis.getVoices();
                 const voiceConfig = voiceOptions.find(v => v.id === selectedVoice);
-                const selectedVoiceObj = voices.find(v => v.name.includes(voiceConfig?.label || 'Google'));
+                const selectedVoiceObj = voices.find(v => v.name === voiceConfig?.id);
                 if (selectedVoiceObj) {
                     utterance.voice = selectedVoiceObj;
                 }
