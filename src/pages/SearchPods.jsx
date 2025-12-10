@@ -237,25 +237,34 @@ export default function SearchPods() {
 
     // Load more subtopics
     const loadMoreSubtopics = async (categoryId) => {
+        if (!categoryData[categoryId]) return;
+        
         setLoadingMoreSubtopics(categoryId);
         
         try {
+            const currentSubtopics = categoryData[categoryId].subtopics || [];
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 6 more unique subtopics for the "${categoryId}" category. Make them different from typical suggestions.`,
-                add_context_from_internet: true,
+                prompt: `Generate 6 more unique and creative subtopics for the "${categoryId}" category. Avoid these existing ones: ${currentSubtopics.join(', ')}. Return only new topics.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        subtopics: { type: "array", items: { type: "string" } }
+                        subtopics: { 
+                            type: "array", 
+                            items: { type: "string" },
+                            minItems: 6,
+                            maxItems: 6
+                        }
                     }
                 }
             });
+            
+            const newSubtopics = response?.subtopics || [];
             
             setCategoryData(prev => ({
                 ...prev,
                 [categoryId]: {
                     ...prev[categoryId],
-                    subtopics: [...(prev[categoryId]?.subtopics || []), ...(response?.subtopics || [])]
+                    subtopics: [...currentSubtopics, ...newSubtopics]
                 }
             }));
         } catch (error) {
