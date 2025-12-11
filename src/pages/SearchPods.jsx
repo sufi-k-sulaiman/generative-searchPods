@@ -1114,14 +1114,23 @@ export default function SearchPods() {
                                 setShowSuggestions(true);
                             }}
                             onFocus={() => setShowSuggestions(true)}
-                            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                             placeholder="Search any topic"
                             className={`w-full h-14 pl-6 pr-32 rounded-full shadow-sm focus:border-purple-300 focus:ring-2 focus:ring-purple-100 text-lg ${darkMode ? 'bg-gray-800 border-gray-700 text-white placeholder:text-gray-400' : 'bg-white border-gray-200 text-gray-900'}`}
                         />
                         <button
                             type="submit"
                             disabled={!searchQuery.trim()}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 px-5 h-10 rounded-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-white font-medium transition-colors"
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                if (!searchQuery.trim()) return;
+                                setShowSuggestions(false);
+                            }}
+                            onTouchStart={(e) => {
+                                e.preventDefault();
+                                if (!searchQuery.trim()) return;
+                                setShowSuggestions(false);
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 px-5 h-10 rounded-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-white font-medium transition-colors touch-manipulation"
                         >
                             <Sparkles className="w-4 h-4" />
                             Generate
@@ -1139,11 +1148,17 @@ export default function SearchPods() {
                                         {suggestions.map((suggestion, i) => (
                                             <button
                                                 key={i}
-                                                onClick={() => {
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
                                                     setSearchQuery(suggestion);
                                                     setShowSuggestions(false);
                                                 }}
-                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
+                                                onTouchStart={(e) => {
+                                                    e.preventDefault();
+                                                    setSearchQuery(suggestion);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors touch-manipulation ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
                                             >
                                                 <Sparkles className="w-4 h-4 text-purple-600" />
                                                 <span>{suggestion}</span>
@@ -1162,11 +1177,17 @@ export default function SearchPods() {
                                         {trendingTopics.slice(0, 6).map((topic, i) => (
                                             <button
                                                 key={i}
-                                                onClick={() => {
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
                                                     setSearchQuery(topic);
                                                     setShowSuggestions(false);
                                                 }}
-                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
+                                                onTouchStart={(e) => {
+                                                    e.preventDefault();
+                                                    setSearchQuery(topic);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className={`w-full px-6 py-3 text-left flex items-center gap-3 transition-colors touch-manipulation ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-purple-50 text-gray-900'}`}
                                             >
                                                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-600'}`}>
                                                     {i + 1}
