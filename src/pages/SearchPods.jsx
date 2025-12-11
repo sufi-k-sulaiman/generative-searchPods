@@ -767,11 +767,12 @@ export default function SearchPods() {
     // Handle search
     const handleSearch = (e) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            // Update URL for display only (aesthetic)
-            const topicSlug = searchQuery.trim().replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+        const query = searchQuery.trim();
+        if (query) {
+            setShowSuggestions(false);
+            const topicSlug = query.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
             window.history.pushState({}, '', `${window.location.pathname}/${topicSlug}`);
-            playEpisode({ title: searchQuery, category: 'Search' });
+            playEpisode({ title: query, category: 'Search' });
         }
     };
 
