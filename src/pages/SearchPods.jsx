@@ -1081,6 +1081,19 @@ export default function SearchPods() {
 
     return (
         <div className={`min-h-screen pb-8 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
+            <style>{`
+                /* Fix iOS/iPadOS button interaction issues */
+                button, a, [role="button"] {
+                    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+                    -webkit-user-select: none;
+                    user-select: none;
+                    cursor: pointer !important;
+                }
+                
+                * {
+                    -webkit-tap-highlight-color: transparent;
+                }
+            `}</style>
             {/* Logo Header */}
             <div className={`${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-b sticky top-0 z-50`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-center gap-3">
