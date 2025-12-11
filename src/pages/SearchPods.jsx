@@ -770,8 +770,6 @@ export default function SearchPods() {
         const query = searchQuery.trim();
         if (query) {
             setShowSuggestions(false);
-            const topicSlug = query.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-            window.history.pushState({}, '', `${window.location.pathname}/${topicSlug}`);
             playEpisode({ title: query, category: 'Search' });
         }
     };
