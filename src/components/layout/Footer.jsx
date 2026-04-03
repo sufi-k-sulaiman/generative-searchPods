@@ -18,7 +18,7 @@ export default function Footer() {
                     </nav>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-                    © 2025 1cPublishing.com
+                    <p>Copyright © 2026 <a href="https://1cplatform.com/" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 transition-colors">1cPlatform</a>. Developed by <a href="https://sufikhan.com/" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:text-purple-700 transition-colors">Sufi K Sulaiman</a>. All rights reserved.</p>
                 </div>
             </div>
         </footer>
