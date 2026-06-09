@@ -16,12 +16,7 @@ export default function PageLayout({ children, activePage }) {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <Toaster position="bottom-right" />
-            <Header 
-                title={activePage} 
-                sidebarOpen={sidebarOpen} 
-                setSidebarOpen={setSidebarOpen}
-                currentPage={activePage}
-            />
+{/* Header hidden */}
             
             <div className="flex flex-1 overflow-hidden">
                 <Sidebar 
