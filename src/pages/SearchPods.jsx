@@ -434,25 +434,27 @@ export default function SearchPods() {
             setGenerationStep('Writing script...');
             setGenerationProgress(10);
 
-            // Generate longer script using LLM for 16 minute podcast
+            // Generate longer script using LLM for 20 minute podcast
             let rawText;
             try {
                 const scriptResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `Write a detailed, engaging 16-minute podcast script about "${episode.title}". 
+                    prompt: `Write a comprehensive, engaging 20-minute podcast script about "${episode.title}". 
 
             Include:
             - A warm welcome and introduction
-            - Deep exploration of the topic with multiple key points
-            - Real examples, stories, or case studies
-            - Practical tips or actionable insights
-            - Interesting facts or statistics
-            - Different perspectives on the topic
-            - Advanced insights and nuances
-            - A thoughtful conclusion with takeaways
+            - Thorough exploration of the topic with multiple key points
+            - Real examples, stories, and detailed case studies
+            - Practical tips and actionable insights with explanations
+            - Interesting facts, statistics, and data points
+            - Different perspectives and viewpoints on the topic
+            - Advanced insights, nuances, and deeper analysis
+            - Personal anecdotes or relatable scenarios
+            - Future implications and trends
+            - A thoughtful conclusion with key takeaways
 
             Write in a conversational, friendly tone as if speaking directly to one listener. 
             Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
-            Aim for about 2400-2800 words to fill 16 minutes of audio.`,
+            Aim for about 5000-5500 words to fill 20 minutes of audio.`,
                     add_context_from_internet: true
                 });
                 rawText = scriptResponse || `Welcome to this episode about ${episode.title}. Today we explore this fascinating topic together.`;
