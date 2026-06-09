@@ -1,0 +1,45 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "sms",
+        "chat",
+        "email"
+      ],
+      "description": "Message type"
+    },
+    "from_user": {
+      "type": "string",
+      "description": "Sender email or phone"
+    },
+    "to_user": {
+      "type": "string",
+      "description": "Recipient email or phone"
+    },
+    "content": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "delivered",
+        "read",
+        "failed"
+      ],
+      "default": "sent"
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "Group messages by conversation"
+    }
+  },
+  "required": [
+    "type",
+    "content"
+  ]
+}

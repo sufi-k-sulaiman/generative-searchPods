@@ -1,0 +1,41 @@
+{
+  "name": "ContactMessage",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "sales",
+        "feedback",
+        "support"
+      ],
+      "description": "Type of contact message"
+    },
+    "to_email": {
+      "type": "string",
+      "description": "Target email address"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Message subject"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "read",
+        "replied"
+      ],
+      "default": "new"
+    }
+  },
+  "required": [
+    "type",
+    "subject",
+    "message"
+  ]
+}

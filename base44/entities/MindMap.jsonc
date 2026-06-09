@@ -1,0 +1,27 @@
+{
+  "name": "MindMap",
+  "type": "object",
+  "properties": {
+    "topic": {
+      "type": "string",
+      "description": "The central topic of the mind map"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": true
+      },
+      "description": "The nodes and connections of the mind map"
+    },
+    "userId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "topic",
+    "nodes",
+    "userId"
+  ]
+}

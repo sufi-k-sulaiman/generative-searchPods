@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
                                 Go Home
                             </Button>
                         </div>
-                        {process.env.NODE_ENV === 'development' && this.state.error && (
+                        {typeof process !== 'undefined' && process.env.NODE_ENV === 'development' && this.state.error && (
                             <details className="mt-6 text-left">
                                 <summary className="text-xs text-gray-500 cursor-pointer flex items-center gap-1">
                                     <Bug className="w-3 h-3" /> Technical Details

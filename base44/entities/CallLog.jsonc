@@ -1,0 +1,49 @@
+{
+  "name": "CallLog",
+  "type": "object",
+  "properties": {
+    "phone_number": {
+      "type": "string",
+      "description": "Phone number called"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Contact name if available"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "outgoing",
+        "incoming",
+        "missed",
+        "conference"
+      ],
+      "description": "Call type"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Call duration in seconds"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "busy",
+        "no-answer",
+        "failed"
+      ],
+      "default": "completed"
+    },
+    "conference_participants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Conference call participants"
+    }
+  },
+  "required": [
+    "phone_number",
+    "type"
+  ]
+}

@@ -6,7 +6,7 @@ import {
     ChevronRight, X, Clock, Plus, AlertTriangle, RotateCcw, RotateCw,
     ListMusic, Sliders, Eye, MessageSquarePlus, Heart, Shield, Zap,
     Target, Sprout, Mountain, Award, Flame, Gift, Sun, Focus,
-    BookOpen, Brain, Compass, Scale, Lightbulb, Rocket, Star, Moon
+    BookOpen, Brain, Compass, Scale, Lightbulb, Rocket, Star, Moon, Download
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -420,9 +420,10 @@ export default function SearchPods() {
             setImageLoading(false);
         });
 
+        let progressInterval;
         try {
             // Simulate progressive loading
-            const progressInterval = setInterval(() => {
+            progressInterval = setInterval(() => {
                 setGenerationProgress(prev => {
                     if (prev < 20) return prev + 2;
                     if (prev < 40) return prev + 1;
@@ -1601,6 +1602,20 @@ export default function SearchPods() {
                             ))}
                         </div>
                         </div>
+
+                        {/* Download Button */}
+                        <button
+                            onClick={downloadMp3}
+                            disabled={!audioUrlRef.current || isGenerating}
+                            className={`mt-3 md:mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium transition-all active:scale-[0.98] touch-manipulation ${
+                                darkMode
+                                    ? 'bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 hover:text-white'
+                                    : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            <Download className="w-5 h-5" />
+                            <span>Download Audio</span>
+                        </button>
 
                         {/* Voice Selection */}
                         <div className="mt-3 md:mt-4 flex items-center justify-center gap-2 flex-wrap">

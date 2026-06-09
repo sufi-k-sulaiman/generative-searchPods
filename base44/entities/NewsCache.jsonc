@@ -1,0 +1,26 @@
+{
+  "name": "NewsCache",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "News category or search query"
+    },
+    "articles": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Cached news articles"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this cache expires"
+    }
+  },
+  "required": [
+    "category",
+    "articles"
+  ]
+}
