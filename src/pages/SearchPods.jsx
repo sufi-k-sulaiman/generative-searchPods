@@ -434,43 +434,51 @@ export default function SearchPods() {
             setGenerationStep('Writing script...');
             setGenerationProgress(10);
 
-            // Generate longer script using LLM for 20 minute podcast
+            // Generate longer script using LLM for 20 minute podcast (two parts)
             let rawText;
             try {
-                const scriptResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `Write a comprehensive, engaging 20-minute podcast script about "${episode.title}". 
+                // Part 1: Introduction and first half
+                const scriptPart1 = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Write the FIRST HALF of a detailed 20-minute podcast script about "${episode.title}". 
 
-            Include:
+            This first half should include:
             - A warm welcome and introduction
-            - Thorough exploration of the topic with multiple key points
-            - Real examples, stories, and detailed case studies
-            - Practical tips and actionable insights with explanations
-            - Interesting facts, statistics, and data points
-            - Different perspectives and viewpoints on the topic
-            - Advanced insights, nuances, and deeper analysis
-            - Personal anecdotes or relatable scenarios
-            - Future implications and trends
-            - A thoughtful conclusion with key takeaways
+            - Background and context on the topic
+            - First set of key insights and analysis
+            - Real examples, stories, and case studies
+            - Interesting facts and statistics
 
             Write in a conversational, friendly tone as if speaking directly to one listener. 
             Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
-            Aim for about 5000-5500 words to fill 20 minutes of audio.`,
+            Write about 2500 words. Do NOT wrap up or conclude - the episode will continue.`,
                     add_context_from_internet: true
                 });
-                rawText = scriptResponse || `Welcome to this episode about ${episode.title}. Today we explore this fascinating topic together.`;
+
+                setGenerationProgress(30);
+                setGenerationStep('Writing second half...');
+
+                // Part 2: Second half and conclusion
+                const scriptPart2 = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Write the SECOND HALF of a 20-minute podcast episode about "${episode.title}". 
+
+            This second half should include:
+            - More advanced insights and deeper analysis
+            - Different perspectives and viewpoints
+            - Practical tips and actionable advice
+            - Future implications and trends
+            - A thoughtful conclusion with key takeaways and a warm sign-off
+
+            Write in a conversational, friendly tone as if speaking directly to one listener. 
+            Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
+            Write about 2500 words.`,
+                    add_context_from_internet: true
+                });
+
+                const scriptResponse = (scriptPart1 || '') + ' ' + (scriptPart2 || '');
+                rawText = scriptResponse.trim() || `Welcome to this episode about ${episode.title}. Today we explore this fascinating topic together.`;
             } catch (llmError) {
                 console.log('LLM fallback:', llmError);
-                rawText = `Welcome to this episode about ${episode.title}. 
-
-            Today we're going to explore this fascinating topic together. Let me share some key insights with you.
-
-            First, it's important to understand the fundamentals. This topic has been gaining attention for good reasons and there are several aspects worth considering.
-
-            The implications are quite significant when you think about it. Many experts have shared their perspectives on this subject.
-
-            What makes this particularly interesting is how it connects to our daily lives. Understanding these concepts can help us make better decisions.
-
-            As we wrap up, remember that learning is a continuous journey. Thank you for listening, and I hope you found this helpful. Until next time!`;
+                rawText = `Welcome to this episode about ${episode.title}. Today we explore this fascinating topic together. Let me share some key insights with you. This topic has been gaining attention for good reasons and there are several aspects worth considering. The implications are quite significant. Many experts have shared their perspectives. What makes this particularly interesting is how it connects to our daily lives. Understanding these concepts can help us make better decisions. As we wrap up, remember that learning is a continuous journey. Thank you for listening!`;
             }
             
             clearInterval(progressInterval);
