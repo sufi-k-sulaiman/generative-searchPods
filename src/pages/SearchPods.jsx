@@ -193,7 +193,7 @@ export default function SearchPods() {
         const loadTrendingTopics = async () => {
             try {
                 const response = await base44.integrations.Core.InvokeLLM({
-                    prompt: `Generate 8 trending podcast topics that people are searching for right now. Include diverse topics from technology, health, business, personal development, and current events.`,
+                    prompt: `Generate 8 trending podcast topics that people are searching for right now. Include diverse topics from technology, health, business, personal development, and current events. Do NOT include any website names, URLs, domains, links, or website references.`,
                     response_json_schema: {
                         type: "object",
                         properties: {
@@ -222,7 +222,7 @@ export default function SearchPods() {
         const debounce = setTimeout(async () => {
             try {
                 const response = await base44.integrations.Core.InvokeLLM({
-                    prompt: `User is searching for: "${searchQuery}". Suggest 5 related podcast topics they might be interested in. Be specific and relevant.`,
+                    prompt: `User is searching for: "${searchQuery}". Suggest 5 related podcast topics they might be interested in. Be specific and relevant. Do NOT include any website names, URLs, domains, links, or website references.`,
                     response_json_schema: {
                         type: "object",
                         properties: {
@@ -278,7 +278,7 @@ export default function SearchPods() {
         
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate ${episodeCount} podcast episode ideas for the "${categoryId}" category. Each should have a compelling title and brief description. Also suggest 6 subtopics for filtering.`,
+                prompt: `Generate ${episodeCount} podcast episode ideas for the "${categoryId}" category. Each should have a compelling title and brief description. Also suggest 6 subtopics for filtering. Do NOT include any website names, URLs, domains, links, or website references in titles or descriptions.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -322,7 +322,7 @@ export default function SearchPods() {
         try {
             const currentSubtopics = categoryData[categoryId].subtopics || [];
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 6 unique subtopics for the "${categoryId}" category. Make them different from these: ${currentSubtopics.join(', ')}. Return as a JSON array.`,
+                prompt: `Generate 6 unique subtopics for the "${categoryId}" category. Make them different from these: ${currentSubtopics.join(', ')}. Do NOT include any website names, URLs, domains, links, or website references. Return as a JSON array.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -806,7 +806,7 @@ export default function SearchPods() {
 
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Based on someone listening to "${currentEpisode.title}" in the ${currentEpisode.category} category, suggest 5 related podcast topics they might enjoy. Make them diverse but related.`,
+                prompt: `Based on someone listening to "${currentEpisode.title}" in the ${currentEpisode.category} category, suggest 5 related podcast topics they might enjoy. Make them diverse but related. Do NOT include any website names, URLs, domains, links, or website references.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
