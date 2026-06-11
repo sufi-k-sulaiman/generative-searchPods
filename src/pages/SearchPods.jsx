@@ -450,6 +450,7 @@ export default function SearchPods() {
 
             Write in a conversational, friendly tone as if speaking directly to one listener. 
             Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
+            Do NOT include any website names, URLs, domains, links, or website references.
             Write about 2500 words. Do NOT wrap up or conclude - the episode will continue.`,
                     add_context_from_internet: true
                 });
@@ -470,6 +471,7 @@ export default function SearchPods() {
 
             Write in a conversational, friendly tone as if speaking directly to one listener. 
             Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
+            Do NOT include any website names, URLs, domains, links, or website references.
             Write about 2500 words.`,
                     add_context_from_internet: true
                 });
@@ -945,16 +947,17 @@ export default function SearchPods() {
 
     // Extend the podcast content
     const extendPodcast = async () => {
-        if (!currentEpisode || isExtending) return;
-        setIsExtending(true);
+    if (!currentEpisode || isExtending) return;
+    setIsExtending(true);
 
-        try {
-            const currentContent = sentencesRef.current.join(' ');
+    try {
+        const currentContent = sentencesRef.current.join(' ');
 
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
+        const response = await base44.integrations.Core.InvokeLLM({
+            prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
 
-    Write 10 more paragraphs (about 4 minutes worth) expanding on the topic with new insights, examples, stories, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
+    Write 10 more paragraphs (about 4 minutes worth) expanding on the topic with new insights, examples, stories, or related points. Keep the same conversational tone. Do NOT use markdown formatting.
+    Do NOT include any website names, URLs, domains, links, or website references.`,
                 add_context_from_internet: true
             });
 
